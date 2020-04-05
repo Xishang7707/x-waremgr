@@ -38,7 +38,6 @@ namespace common
         /// <param name="path"></param>
         public static void Init(string path)
         {
-            System.Console.WriteLine(path);
             StreamReader sr = new StreamReader(path);
             using JsonTextReader reader = new JsonTextReader(sr);
             JToken o = JToken.ReadFrom(reader);
@@ -48,7 +47,6 @@ namespace common
             DBConfig = new DBConfig(o["DBConfigs"] as JArray);
             CacheConfig = new CacheConfig(o["CacheConfigs"] as JObject);
             UrlConfig = new UrlConfig(o["UrlConfigs"] as JObject);
-            System.Console.WriteLine(path + "---");
         }
     }
 }
