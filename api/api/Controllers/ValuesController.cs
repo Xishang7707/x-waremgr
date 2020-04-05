@@ -27,7 +27,7 @@ namespace api.Controllers
             return new string[] { salt, pwd };
         }
 
-        class SQLModel
+        public class SQLModel
         {
             public string guid { get; set; }
             public string str { get; set; }
