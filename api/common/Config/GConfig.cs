@@ -48,6 +48,7 @@ namespace common
             DBConfig = new DBConfig(o["DBConfigs"] as JArray);
             CacheConfig = new CacheConfig(o["CacheConfigs"] as JObject);
             UrlConfig = new UrlConfig(o["UrlConfigs"] as JObject);
+            System.Console.WriteLine(path + "---");
         }
     }
 }
