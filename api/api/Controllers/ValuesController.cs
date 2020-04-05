@@ -27,6 +27,11 @@ namespace api.Controllers
             return new string[] { salt, pwd };
         }
 
+        class SQLModel
+        {
+            public string guid { get; set; }
+            public string str { get; set; }
+        }
         /// <summary>
         /// 数据库加密
         /// </summary>
@@ -35,13 +40,13 @@ namespace api.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult SQL(string guid, string str)
+        public IActionResult SQL(SQLModel model)
         {
             return new Result<string>
             {
                 code = ErrorCodeConst.ERROR_200,
                 status = ErrorCodeConst.ERROR_200,
-                data = Common.AESEncrypt(Encoding.Default.GetString(Convert.FromBase64String(str)), guid)
+                data = Common.AESEncrypt(Encoding.Default.GetString(Convert.FromBase64String(model.str)), model.guid)
             };
         }
     }
