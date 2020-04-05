@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using api.responses;
 using common.Consts;
@@ -40,7 +41,7 @@ namespace api.Controllers
             {
                 code = ErrorCodeConst.ERROR_200,
                 status = ErrorCodeConst.ERROR_200,
-                data = Common.AESEncrypt(str, guid)
+                data = Common.AESEncrypt(Encoding.Default.GetString(Convert.FromBase64String(str)), guid)
             };
         }
     }
