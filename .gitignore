@@ -3,7 +3,7 @@
 ################################################################################
 
 /api/.vs/api
-/api/api/bin/Debug/netcoreapp3.1
+/api/api/bin
 /api/api/obj
 /api/common/bin
 /api/common/obj
@@ -14,3 +14,5 @@
 /api/test/bin
 /api/test/obj
 /db
+/api/api/.config
+/api/api/Properties

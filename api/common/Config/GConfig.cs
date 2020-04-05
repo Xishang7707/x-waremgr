@@ -38,6 +38,7 @@ namespace common
         /// <param name="path"></param>
         public static void Init(string path)
         {
+            System.Console.WriteLine(path);
             StreamReader sr = new StreamReader(path);
             using JsonTextReader reader = new JsonTextReader(sr);
             JToken o = JToken.ReadFrom(reader);

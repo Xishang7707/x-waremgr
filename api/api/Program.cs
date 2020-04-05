@@ -20,8 +20,8 @@ namespace api
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            GConfig.Init(PConfig.AppSettingPath);
-            new ConfigurationBuilder().AddJsonFile(PConfig.AppSettingPath).AddEnvironmentVariables().Build();
+            GConfig.Init(PConfig.AppSettingPath + "/appsettings.json");
+            new ConfigurationBuilder().SetBasePath(PConfig.AppSettingPath).AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
             return Host.CreateDefaultBuilder(args)
                    .ConfigureWebHostDefaults(webBuilder =>
                    {

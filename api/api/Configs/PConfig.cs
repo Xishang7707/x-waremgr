@@ -16,6 +16,6 @@ namespace api.Configs
         /// <summary>
         /// 配置文件路径
         /// </summary>
-        public static string AppSettingPath = "/xis-projects/x-waremgr/appsettings.json";//@"D:\Visual Studio Projects\x-waremgr\api\api\appsettings.json";
+        public static string AppSettingPath = "/xis-projects/x-waremgr";//@"D:\Visual Studio Projects\x-waremgr\api\api\appsettings.json";
     }
 }
