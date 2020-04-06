@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace api.Configs
@@ -15,7 +16,7 @@ namespace api.Configs
 
         /// <summary>
         /// 配置文件路径
-        /// </summary>
-        public static string AppSettingPath = "/xis-projects/x-waremgr/appsettings.json";//@"D:\Visual Studio Projects\x-waremgr\api\api\appsettings.json";
+        /// </summary>//"/xis-projects/x-waremgr/appsettings.json";//
+        public static string AppSettingPath = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "/xis-projects/x-waremgr/appsettings.json" : @"D:\Visual Studio Projects\x-waremgr\api\api\appsettings.json";
     }
 }

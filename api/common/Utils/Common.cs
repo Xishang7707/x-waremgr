@@ -70,7 +70,7 @@ namespace common.Utils
         public static string AESEncrypt(string str, string _salt)
         {
             var encryptKey = Encoding.UTF8.GetBytes(_salt);
-            var iv = Encoding.UTF8.GetBytes("ASDFGHJKLQWERTYU"); //偏移量,最小为16
+            var iv = Encoding.UTF8.GetBytes("ASDFGHJKLQWERTYUASDFGHJKLQWERTYU"); //偏移量,最小为16
             using (var aesAlg = Aes.Create())
             {
                 using (var encryptor = aesAlg.CreateEncryptor(encryptKey, iv))

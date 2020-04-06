@@ -13,8 +13,8 @@ using Microsoft.Extensions.Logging;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class ValuesController : ControllerBase
+    [Route("api/[controller]")]
+    public class ValuesController : BaseController
     {
         [HttpGet]
         [AllowAnonymous]
@@ -38,15 +38,15 @@ namespace api.Controllers
         /// <param name="guid"></param>
         /// <param name="str"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("sql")]
         [AllowAnonymous]
-        public IActionResult SQL(SQLModel model)
+        public IActionResult SQL(string guid, string str)
         {
             return new Result<string>
             {
                 code = ErrorCodeConst.ERROR_200,
                 status = ErrorCodeConst.ERROR_200,
-                data = Common.AESEncrypt(Encoding.Default.GetString(Convert.FromBase64String(model.str)), model.guid)
+                data = Common.AESEncrypt(str, guid)
             };
         }
     }
