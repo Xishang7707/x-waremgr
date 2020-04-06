@@ -40,13 +40,13 @@ namespace api.Controllers
         /// <returns></returns>
         [HttpGet("sql")]
         [AllowAnonymous]
-        public IActionResult SQL(string guid, string str)
+        public IActionResult SQL([FromQuery]SQLModel model)
         {
             return new Result<string>
             {
                 code = ErrorCodeConst.ERROR_200,
                 status = ErrorCodeConst.ERROR_200,
-                data = Common.AESEncrypt(str, guid)
+                data = Common.AESEncrypt(model.str, model.guid)
             };
         }
     }
