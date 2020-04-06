@@ -70,26 +70,16 @@ namespace common.Utils
         public static string AESEncrypt(string str, string _salt)
         {
             var encryptKey = Encoding.UTF8.GetBytes(_salt);
-            var iv = Encoding.UTF8.GetBytes("ASDFGHJKLQWERTYUASDFGHJKLQWERTYU"); //偏移量,最小为16
-            using (var aesAlg = Aes.Create())
-            {
-                using (var encryptor = aesAlg.CreateEncryptor(encryptKey, iv))
-                {
-                    using (var msEncrypt = new MemoryStream())
-                    {
-                        using (var csEncrypt = new CryptoStream(msEncrypt, encryptor,
-                            CryptoStreamMode.Write))
+            var iv = Encoding.UTF8.GetBytes("ASDFGHJKLQWERTYU"); //偏移量,最小为16
+            using var aesAlg = Aes.Create();
+            using var encryptor = aesAlg.CreateEncryptor(encryptKey, iv);
+            using var msEncrypt = new MemoryStream();
+            using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+            using (var swEncrypt = new StreamWriter(csEncrypt))
+                swEncrypt.Write(str);
+            var decryptedContent = msEncrypt.ToArray();
 
-                        using (var swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(str);
-                        }
-                        var decryptedContent = msEncrypt.ToArray();
-
-                        return Convert.ToBase64String(decryptedContent);
-                    }
-                }
-            }
+            return Convert.ToBase64String(decryptedContent);
         }
 
         /// <summary>

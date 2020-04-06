@@ -45,5 +45,22 @@ namespace api.Controllers
             IStockServer stockServer = new StockServerImpl();
             return await stockServer.StockInAuditAsync(reqmodel);
         }
+
+        /// <summary>
+        /// @xis 搜索库存 2020-4-6 17:24:01
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet("searchstocktotal")]
+        public async Task<IActionResult> SearchStockTotal([FromQuery]SearchStockModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return GetModelErrorCode();
+            }
+            reqmodel<SearchStockModel> reqmodel = await RequestPackingAsync(model);
+            IStockServer stockServer = new StockServerImpl();
+            return await stockServer.SearchStockAsync(reqmodel);
+        }
     }
 }

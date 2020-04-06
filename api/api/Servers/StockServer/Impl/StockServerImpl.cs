@@ -96,7 +96,6 @@ namespace api.Servers.StockServer.Impl
                 //添加新产品
                 stock_add_list.Add(new t_stock
                 {
-                    order_sn = stock_in.order_sn,
                     add_time = DateTime.Now,
                     batch_number = item.batch_number,
                     expiration_date = item.expiration_date,
@@ -414,7 +413,6 @@ namespace api.Servers.StockServer.Impl
                 i.instructions,
                 i.material_number,
                 i.model_number,
-                i.order_sn,
                 i.package_size,
                 i.product_name,
                 i.quantity,
@@ -645,6 +643,40 @@ namespace api.Servers.StockServer.Impl
             }
 
             return await UpdateStock(u => new { u.quantity }, stock_list);
+        }
+
+        /// <summary>
+        /// @xis 搜索库存
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        public async Task<Result> SearchStockAsync(reqmodel<SearchStockModel> reqmodel)
+        {
+            Result<IEnumerable<SearchStockResult>> result = new Result<IEnumerable<SearchStockResult>> { code = ErrorCodeConst.ERROR_200, status = ErrorCodeConst.ERROR_200 };
+            List<t_stock> stock_list = await GetStockHasByVagueName(s => new { s.id, s.product_name, s.quantity }, reqmodel.Data.name, reqmodel.Data.count);
+            IEnumerable<SearchStockResult> result_list = stock_list.GroupBy(g => g.product_name).Select(s => new SearchStockResult { name = s.Key, quantity = stock_list.Where(w => w.product_name == s.Key).Sum(sm => sm.quantity) });
+            result.data = result_list;
+            return result;
+        }
+
+        /// <summary>
+        /// @xis 模糊查询库存
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="name">产品名称</param>
+        /// <param name="count">数量</param>
+        /// <returns></returns>
+        public async Task<List<t_stock>> GetStockHasByVagueName(Func<t_stock, dynamic> selector, string name, int count = 5)
+        {
+            string sql = g_sqlMaker.Select(selector)
+                                   .Top(count)
+                                   .Where("product_name", "like", "@name")
+                                   .And("quantity", ">", "@quantity")
+                                   .And("status", "=", "@status")
+                                   .And("state", "=", "@state")
+                                   .ToSQL();
+
+            return await g_dbHelper.QueryListAsync<t_stock>(sql, new { name = $"%{name}%", quantity = 0, status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
         }
     }
 }

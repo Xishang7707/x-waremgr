@@ -9,6 +9,13 @@ namespace common.SqlMaker.Interface
     public interface ISelect<T> : ISqlBase where T : new()
     {
         /// <summary>
+        /// 取前n个
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        ISelect<T> Top(int count);
+
+        /// <summary>
         /// 条件
         /// </summary>
         /// <param name="where_sql">条件SQL</param>

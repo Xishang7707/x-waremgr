@@ -14,6 +14,11 @@ namespace common.SqlMaker.Impl.MySql
         /// </summary>
         protected dynamic _select_cols;
 
+        /// <summary>
+        /// top
+        /// </summary>
+        protected string _top_sql;
+
         public SelectImpl(Func<T, dynamic> selector)
         {
             if (selector == null)
@@ -30,6 +35,12 @@ namespace common.SqlMaker.Impl.MySql
             }
         }
 
+        public ISelect<T> Top(int count)
+        {
+            _top_sql = $"TOP {count}";
+            return this;
+        }
+
         /// <summary>
         /// 生成SQL
         /// </summary>
@@ -38,7 +49,7 @@ namespace common.SqlMaker.Impl.MySql
         {
             Type ty = _select_cols.GetType();
             IEnumerable<string> select_cols = ty.GetProperties().Select(s => $"`{s.Name}`");
-            return SpliceSQL($"SELECT {string.Join(",", select_cols)} FROM `{_dt_type.Name}`");
+            return SpliceSQL($"SELECT {_top_sql} {string.Join(",", select_cols)} FROM `{_dt_type.Name}`");
         }
 
         public IWhere<T> Where(string key, string rel, object val)

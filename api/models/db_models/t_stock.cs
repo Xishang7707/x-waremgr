@@ -14,11 +14,6 @@ namespace models.db_models
         /// </summary>
         public int id { get; set; }
 
-        /// <summary>
-        /// 入库订单号
-        /// </summary>
-        public string order_sn { get; set; }
-
         ///// <summary>
         ///// 产品id
         ///// </summary>

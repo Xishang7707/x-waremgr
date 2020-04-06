@@ -9,6 +9,11 @@ namespace common.SqlMaker.Impl
     /// </summary>
     class MssqlSqlMakerImpl : ISqlMaker
     {
+        public ISelect<T> Top<T>(Func<T, dynamic> selector = null) where T : new()
+        {
+            throw new NotImplementedException();
+        }
+
         IDelete<T> ISqlMaker.Delete<T>()
         {
             return new DeleteImpl<T>();
