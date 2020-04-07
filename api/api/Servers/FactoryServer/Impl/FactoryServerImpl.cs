@@ -80,6 +80,12 @@ namespace api.Servers.FactoryServer.Impl
 
         public async Task<t_factory> GetFactoryById(Func<t_factory, dynamic> selector, int id)
         {
+            string sql_select_factory = g_sqlMaker.Select(selector).Where("id", "=", "@id").ToSQL();
+            return await g_dbHelper.QueryAsync<t_factory>(sql_select_factory, new { id });
+        }
+
+        public async Task<t_factory> GetFactoryByIdEnable(Func<t_factory, dynamic> selector, int id)
+        {
             string sql_select_factory = g_sqlMaker.Select(selector).Where("id", "=", "@id").And("state", "=", "@state").And("status", "=", "@status").ToSQL();
             return await g_dbHelper.QueryAsync<t_factory>(sql_select_factory, new { id, state = (int)EnumState.Normal, status = (int)EnumStatus.Enable });
         }

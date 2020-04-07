@@ -14,11 +14,6 @@ namespace models.db_models
         /// </summary>
         public int id { get; set; }
 
-        ///// <summary>
-        ///// 产品id
-        ///// </summary>
-        //public int product_id { get; set; }
-
         /// <summary>
         /// 产品名称
         /// </summary>

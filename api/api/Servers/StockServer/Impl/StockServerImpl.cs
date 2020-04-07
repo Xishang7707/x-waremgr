@@ -40,12 +40,6 @@ namespace api.Servers.StockServer.Impl
             return prefix + DateTime.Now.ToString("yyyyMMddHHmmssms") + (new Random(DateTime.Now.Millisecond).Next(0, 100000));
         }
 
-        public Task<Result> GetStockInList(reqmodel<QueryStockInModel> reqmodel)
-        {
-            string sql_stock_in = g_sqlMaker.Select<t_stock_in>().Where("in_user_id", "=", "@user_id").ToSQL();
-            return null;
-        }
-
         /// <summary>
         /// @xis 入库申请
         /// </summary>
@@ -94,9 +88,21 @@ namespace api.Servers.StockServer.Impl
                     stock_detail_list.Add(new t_stock_in_detail
                     {
                         order_sn = stock_in.order_sn,
-                        price = item.unit_price,
+                        unit_price = item.unit_price,
                         stock_id = item.id,
-                        quantity = item.quantity
+                        quantity = item.quantity,
+                        batch_number = item.batch_number,
+                        expiration_date = item.expiration_date,
+                        instructions = item.instructions,
+                        material_number = item.material_number,
+                        model_number = item.model_number,
+                        package_size = item.package_size,
+                        product_name = item.product_name,
+                        report_card_url = item.report_card_url,
+                        retest_date = item.retest_date,
+                        spare_parts = item.spare_parts,
+                        unit_name = item.unit_name,
+                        factory_id = item.factory_id
                     });
                     continue;
                 }
@@ -153,9 +159,21 @@ namespace api.Servers.StockServer.Impl
                         stock_detail_list.Add(new t_stock_in_detail
                         {
                             order_sn = stock_in.order_sn,
-                            price = item.unit_price,
+                            stock_id = add_result.data,
+                            batch_number = item.batch_number,
+                            expiration_date = item.expiration_date,
+                            factory_id = item.factory_id,
+                            instructions = item.instructions,
+                            material_number = item.material_number,
+                            model_number = item.model_number,
+                            package_size = item.package_size,
+                            product_name = item.product_name,
+                            report_card_url = item.report_card_url,
+                            retest_date = item.retest_date,
+                            spare_parts = item.spare_parts,
+                            unit_name = item.util_name,
                             quantity = quantity,
-                            stock_id = add_result.data
+                            unit_price = item.unit_price,
                         });
                     }
                 }
@@ -398,7 +416,7 @@ namespace api.Servers.StockServer.Impl
                 return res;
             }
             IFactoryServer factoryServer = new FactoryServerImpl(g_dbHelper, g_logServer);
-            t_factory factory_model = await factoryServer.GetFactoryById(g => new { g.id }, model.factory_id);
+            t_factory factory_model = await factoryServer.GetFactoryByIdEnable(g => new { g.id }, model.factory_id);
             if (factory_model == null)
             {
                 res.code = ErrorCodeConst.ERROR_1045;
@@ -461,9 +479,21 @@ namespace api.Servers.StockServer.Impl
             string sql = g_sqlMaker.Insert<t_stock_in_detail>(i => new
             {
                 i.order_sn,
-                i.price,
+                i.unit_price,
                 i.quantity,
-                i.stock_id
+                i.stock_id,
+                i.batch_number,
+                i.expiration_date,
+                i.factory_id,
+                i.instructions,
+                i.material_number,
+                i.model_number,
+                i.package_size,
+                i.product_name,
+                i.report_card_url,
+                i.retest_date,
+                i.spare_parts,
+                i.unit_name
             }).ToSQL();
 
             int id = await g_dbHelper.ExecScalarAsync<int>(sql, model);
@@ -494,9 +524,21 @@ namespace api.Servers.StockServer.Impl
             string sql = g_sqlMaker.Insert<t_stock_in_detail>(i => new
             {
                 i.order_sn,
-                i.price,
+                i.unit_price,
                 i.quantity,
-                i.stock_id
+                i.stock_id,
+                i.batch_number,
+                i.expiration_date,
+                i.factory_id,
+                i.instructions,
+                i.material_number,
+                i.model_number,
+                i.package_size,
+                i.product_name,
+                i.report_card_url,
+                i.retest_date,
+                i.spare_parts,
+                i.unit_name
             }).ToSQL();
 
             int count = await g_dbHelper.ExecAsync(sql, model);
@@ -634,6 +676,36 @@ namespace api.Servers.StockServer.Impl
         }
 
         /// <summary>
+        /// @xis 获取入库单产品
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="order_sn">订单号</param>
+        /// <returns></returns>
+        public async Task<List<t_stock>> GetStockByOrderSn(Func<t_stock, dynamic> selector, string order_sn)
+        {
+            string sql = g_sqlMaker.Select(selector)
+                                   .Where("order_sn", "=", "@order_sn")
+                                   .ToSQL();
+
+            return await g_dbHelper.QueryListAsync<t_stock>(sql, new { order_sn });
+        }
+
+        /// <summary>
+        /// @xis 获取入库单产品详情
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="order_sn">订单号</param>
+        /// <returns></returns>
+        public async Task<List<t_stock_in_detail>> GetStockDetailsByOrderSn(Func<t_stock_in_detail, dynamic> selector, string order_sn)
+        {
+            string sql = g_sqlMaker.Select(selector)
+                                   .Where("order_sn", "=", "@order_sn")
+                                   .ToSQL();
+
+            return await g_dbHelper.QueryListAsync<t_stock_in_detail>(sql, new { order_sn });
+        }
+
+        /// <summary>
         /// @xis 搜索入库单
         /// </summary>
         /// <param name="reqmodel"></param>
@@ -720,5 +792,77 @@ namespace api.Servers.StockServer.Impl
             return paginer_data;
         }
 
+        /// <summary>
+        /// @xis 获取入库单详情
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        public async Task<Result> GetStockInDetailAsync(reqmodel<StockInDetailModel> reqmodel)
+        {
+            Result<StockInDetailResult> result = new Result<StockInDetailResult> { code = ErrorCodeConst.ERROR_100, status = ErrorCodeConst.ERROR_403 };
+            t_stock_in stock_in_model = await GetStockInByOrderSn(f => new
+            {
+                f.in_user_id,
+                f.department_id,
+                f.add_time,
+                f.apply_status,
+                f.position_id,
+                f.order_sn
+            }, reqmodel.Data.order_sn);
+
+            if (stock_in_model == null)
+            {
+                result.code = ErrorCodeConst.ERROR_1038;
+                return result;
+            }
+
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
+            IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
+            IAuditServer auditServer = new AuditServerImpl(g_dbHelper, g_logServer);
+
+            t_user user_model = await userServer.GetUserById(s => new { s.real_name, s.job_number }, stock_in_model.in_user_id);
+            t_department depart_model = await departmentServer.GetDepartment(s => new { s.department_name }, stock_in_model.department_id);
+            result.data = new StockInDetailResult
+            {
+                add_time = stock_in_model.add_time.Value.ToString("yyyy-MM-dd hh:mm:ss"),
+                applyer = user_model.real_name,
+                apply_status = stock_in_model.apply_status,
+                job_number = user_model.job_number,
+                order_sn = stock_in_model.order_sn,
+                depart_name = depart_model.department_name,
+                audit_list = await auditServer.GetApplyLogByOrderSnAsync(EnumOrderType.IN, stock_in_model.order_sn, stock_in_model.department_id, stock_in_model.position_id),
+                products = new List<StockInProductResult>()
+            };
+
+            //获取入库的库存信息
+            List<t_stock_in_detail> stock_detail_list = await GetStockDetailsByOrderSn(f => new t_stock_in_detail { }, stock_in_model.order_sn);
+            IFactoryServer factoryServer = new FactoryServerImpl(g_dbHelper, g_logServer);
+
+            foreach (var item in stock_detail_list)
+            {
+                result.data.products.Add(new StockInProductResult
+                {
+                    batch_number = item.batch_number,
+                    expiration_date = item.expiration_date,
+                    factory_id = item.factory_id,
+                    instructions = item.instructions,
+                    material_number = item.material_number,
+                    model_number = item.model_number,
+                    package_size = item.package_size,
+                    product_name = item.product_name,
+                    report_card_url = item.report_card_url,
+                    retest_date = item.retest_date,
+                    spare_parts = item.spare_parts,
+                    unit_name = item.unit_name,
+                    quantity = item.quantity,
+                    unit_price = item.unit_price,
+                    factory_name = (await factoryServer.GetFactoryById(f => new { f.factory_name }, item.factory_id)).factory_name
+                });
+            }
+
+            result.code = ErrorCodeConst.ERROR_200;
+            result.status = ErrorCodeConst.ERROR_200;
+            return result;
+        }
     }
 }

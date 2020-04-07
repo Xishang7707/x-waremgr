@@ -3,6 +3,7 @@ using common.Utils;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace common.Config
 {
@@ -24,7 +25,7 @@ namespace common.Config
                     ActionType = (EnumDBActionType)int.Parse(item["action_type"].ToString()),
                 });
             }
-            DBConfig db = Get("main");
+            DBConfig db = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? Get("main_origin") : Get("main");
             this.Tag = db.Tag;
             this.Conn = db.Conn;
             this.DbType = db.DbType;

@@ -35,5 +35,13 @@ namespace api.Servers.FactoryServer.Interface
         /// <param name="id"></param>
         /// <returns></returns>
         Task<t_factory> GetFactoryById(Func<t_factory, dynamic> selector, int id);
+
+        /// <summary>
+        /// @xis 获取供应商信息
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<t_factory> GetFactoryByIdEnable(Func<t_factory, dynamic> selector, int id);
     }
 }
