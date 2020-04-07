@@ -27,23 +27,20 @@ namespace common.SqlMaker.Impl.MySql
             {
                 throw new TypeErrorException(_dt_type, "匿名类型或者" + _dt_type.FullName);
             }
+
+            _link_list.Add(this);
         }
 
-        public override string ToSQL()
+        public override string ToThisSQL()
         {
             Type ty = _cols.GetType();
             IEnumerable<string> update_cols = ty.GetProperties().Select(s => $"`{s.Name}`=@{s.Name}");
-            return SpliceSQL($@"UPDATE `{_dt_type.Name}` SET {string.Join(", ", update_cols)}");
+            return $@"UPDATE `{_dt_type.Name}` SET {string.Join(", ", update_cols)}";
         }
 
         public IWhere<T> Where(string key, string rel, object val)
         {
-            return new WhereImpl<T>(ToSQL(), key, rel, val);
-        }
-
-        IWhere<T> IUpdate<T>.Where(string where_sql)
-        {
-            return new WhereImpl<T>(ToSQL(), where_sql);
+            return new WhereImpl<T>(_link_list, key, rel, val);
         }
     }
 }

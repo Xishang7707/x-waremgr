@@ -19,6 +19,11 @@ namespace common.SqlMaker.Impl.MySql
         /// </summary>
         protected string _top_sql;
 
+        /// <summary>
+        /// count
+        /// </summary>
+        protected string _count_sql;
+
         public SelectImpl(Func<T, dynamic> selector)
         {
             if (selector == null)
@@ -33,6 +38,13 @@ namespace common.SqlMaker.Impl.MySql
             {
                 throw new TypeErrorException(ty, "匿名类型或者" + _dt_type.FullName);
             }
+            _link_list.Add(this);
+        }
+
+        public ISelect<T> Count(string col)
+        {
+            _count_sql = $"COUNT({col})";
+            return this;
         }
 
         public ISelect<T> Top(int count)
@@ -45,46 +57,41 @@ namespace common.SqlMaker.Impl.MySql
         /// 生成SQL
         /// </summary>
         /// <returns></returns>
-        public override string ToSQL()
+        public override string ToThisSQL()
         {
             Type ty = _select_cols.GetType();
             IEnumerable<string> select_cols = ty.GetProperties().Select(s => $"`{s.Name}`");
-            return SpliceSQL($"SELECT {_top_sql} {string.Join(",", select_cols)} FROM `{_dt_type.Name}`");
+            return $"SELECT {_top_sql} {_count_sql} {string.Join(",", select_cols)} FROM `{_dt_type.Name}`";
         }
 
         public IWhere<T> Where(string key, string rel, object val)
         {
-            return new WhereImpl<T>(ToSQL(), key, rel, val);
+            return new WhereImpl<T>(_link_list, key, rel, val);
+        }
+
+        public IWhere<T> Where()
+        {
+            return new WhereImpl<T>(_link_list);
         }
 
         IGroup ISelect<T>.Group(Func<T, dynamic> selector)
         {
-            return new GroupImpl<T>(ToSQL(), selector);
+            return new GroupImpl<T>(_link_list, selector);
         }
 
         IOrder ISelect<T>.OrderByAsc(string field)
         {
-            return (new OrderImpl<T>(ToSQL()) as IOrder).OrderByAsc(field);
+            return (new OrderImpl<T>(_link_list) as IOrder).OrderByAsc(field);
         }
 
         IOrder ISelect<T>.OrderByDesc(string field)
         {
-            return (new OrderImpl<T>(ToSQL()) as IOrder).OrderByDesc(field);
+            return (new OrderImpl<T>(_link_list) as IOrder).OrderByDesc(field);
         }
 
         IPager ISelect<T>.Pager(int passcount, int count)
         {
-            return new PagerImpl<T>(ToSQL(), passcount, count);
-        }
-
-        /// <summary>
-        /// 条件
-        /// </summary>
-        /// <param name="where_sql">条件SQL</param>
-        /// <returns></returns>
-        IWhere<T> ISelect<T>.Where(string where_sql)
-        {
-            return new WhereImpl<T>(ToSQL(), where_sql);
+            return new PagerImpl<T>(_link_list, passcount, count);
         }
     }
 }

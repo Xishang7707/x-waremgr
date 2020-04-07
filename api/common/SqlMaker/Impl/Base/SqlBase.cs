@@ -6,6 +6,11 @@ namespace common.SqlMaker.Impl.Base
 {
     abstract class SqlBase<T> : ISqlBase where T : new()
     {
+        public SqlBase(List<ISqlBase> link = null)
+        {
+            _link_list = link == null ? new List<ISqlBase>() : new List<ISqlBase>(link);
+        }
+
         /// <summary>
         /// 单元类型
         /// </summary>
@@ -17,32 +22,24 @@ namespace common.SqlMaker.Impl.Base
         protected Type _dt_type = typeof(T);
 
         /// <summary>
-        /// 生成中的SQL
+        /// 链
         /// </summary>
-        private string _making_sql;
+        protected List<ISqlBase> _link_list;
 
         /// <summary>
         /// 生成SQL
         /// </summary>
         /// <returns></returns>
-        public abstract string ToSQL();
+        public abstract string ToThisSQL();
 
-        /// <summary>
-        /// 连接SQL
-        /// </summary>
-        /// <param name="sql"></param>
-        protected string SpliceSQL()
+        public string ToSQL()
         {
-            return _making_sql;
-        }
-
-        /// <summary>
-        /// 连接SQL
-        /// </summary>
-        /// <param name="sql"></param>
-        protected string SpliceSQL(string sql)
-        {
-            return _making_sql += string.IsNullOrWhiteSpace(_making_sql) || string.IsNullOrWhiteSpace(sql) ? sql : " " + sql;
+            string sql = "";
+            foreach (var item in _link_list)
+            {
+                sql += item.ToThisSQL() + " ";
+            }
+            return sql;
         }
     }
 

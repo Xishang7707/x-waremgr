@@ -12,19 +12,14 @@ namespace common.SqlMaker.Impl.MySql
 
         public DeleteImpl() { }
 
-        public override string ToSQL()
+        public override string ToThisSQL()
         {
-            return SpliceSQL($@"DELETE FROM `{_dt_type.Name}`");
-        }
-
-        IWhere<T> IDelete<T>.Where(string where_sql)
-        {
-            return new WhereImpl<T>(ToSQL(), where_sql);
+            return $@"DELETE FROM `{_dt_type.Name}`";
         }
 
         IWhere<T> IDelete<T>.Where(string key, string rel, object val)
         {
-            return new WhereImpl<T>(ToSQL(), key, rel, val);
+            return new WhereImpl<T>(_link_list, key, rel, val);
         }
     }
 }

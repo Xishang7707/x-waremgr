@@ -26,13 +26,14 @@ namespace common.SqlMaker.Impl.MySql
             {
                 throw new TypeErrorException(_dt_type, "匿名类型或者" + _dt_type.FullName);
             }
+            _link_list.Add(this);
         }
 
         /// <summary>
         /// 生成SQL
         /// </summary>
         /// <returns>SQL</returns>
-        public override string ToSQL()
+        public override string ToThisSQL()
         {
             Dictionary<string, string> paramsDic = new Dictionary<string, string>();
             Type ty = _insert_cols.GetType();
@@ -41,7 +42,7 @@ namespace common.SqlMaker.Impl.MySql
             IEnumerable<string> cols_value = cols.Select(s => $@"@{s}");
             cols = cols.Select(s => $@"`{s}`");
 
-            return SpliceSQL($@"INSERT `{typeof(T).Name}`({string.Join(",", cols)}) VALUES({string.Join(",", cols_value)})");
+            return $@"INSERT `{typeof(T).Name}`({string.Join(",", cols)}) VALUES({string.Join(",", cols_value)})";
         }
     }
 }

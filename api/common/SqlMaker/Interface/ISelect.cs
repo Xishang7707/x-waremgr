@@ -16,12 +16,11 @@ namespace common.SqlMaker.Interface
         ISelect<T> Top(int count);
 
         /// <summary>
-        /// 条件
+        /// 数据量
         /// </summary>
-        /// <param name="where_sql">条件SQL</param>
+        /// <param name="col">列名</param>
         /// <returns></returns>
-        [Obsolete("不再使用")]
-        IWhere<T> Where(string where_sql);
+        ISelect<T> Count(string col = "1");
 
         /// <summary>
         /// 条件
@@ -31,6 +30,12 @@ namespace common.SqlMaker.Interface
         /// <param name="val"></param>
         /// <returns></returns>
         IWhere<T> Where(string key, string rel, object val);
+        
+        /// <summary>
+        /// 条件
+        /// </summary>
+        /// <returns></returns>
+        IWhere<T> Where();
 
         /// <summary>
         /// 排序-升序

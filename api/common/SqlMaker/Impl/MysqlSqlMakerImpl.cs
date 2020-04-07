@@ -4,6 +4,9 @@ using System;
 
 namespace common.SqlMaker.Impl
 {
+    /// <summary>
+    /// MySql
+    /// </summary>
     class MysqlSqlMakerImpl : ISqlMaker
     {
         IDelete<T> ISqlMaker.Delete<T>()

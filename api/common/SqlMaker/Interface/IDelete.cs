@@ -11,14 +11,6 @@ namespace common.SqlMaker.Interface
         /// <summary>
         /// 条件
         /// </summary>
-        /// <param name="where_sql">条件SQL</param>
-        /// <returns></returns>
-        [Obsolete("不再使用")]
-        IWhere<T> Where(string where_sql);
-
-        /// <summary>
-        /// 条件
-        /// </summary>
         /// <param name="key"></param>
         /// <param name="rel"></param>
         /// <param name="val"></param>

@@ -44,12 +44,5 @@ namespace common.SqlMaker.Interface
         /// <param name="where"></param>
         /// <returns></returns>
         IWhere<T> And(string key, string rel, object val);
-
-        /// <summary>
-        /// or
-        /// </summary>
-        /// <param name="where"></param>
-        /// <returns></returns>
-        IWhere<T> Or(string key, string rel, object val);
     }
 }

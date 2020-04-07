@@ -1,6 +1,9 @@
 ﻿using common.SqlMaker.Impl.Base;
 using common.SqlMaker.Interface;
+using common.SqlMaker.Interface.Base;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace common.SqlMaker.Impl.Mssql
 {
@@ -18,12 +21,30 @@ namespace common.SqlMaker.Impl.Mssql
         /// 排序字段
         /// </summary>
         /// <param name="sql"></param>
-        public OrderImpl(string sql)
+        private OrderImpl(OrderImpl<T> _obj) : base(_obj._link_list)
         {
-            SpliceSQL(sql);
+            this._order_dic = new Dictionary<string, bool>(_obj._order_dic);
+            if (this._link_list.FirstOrDefault(f => f is IOrder) is IOrder obj)
+            {
+                this._link_list.Remove(obj);
+            }
+            this._link_list.Add(this);
         }
 
-        public override string ToSQL()
+        /// <summary>
+        /// 排序字段
+        /// </summary>
+        /// <param name="sql"></param>
+        public OrderImpl(List<ISqlBase> _link) : base(_link)
+        {
+            if (this._link_list.FirstOrDefault(f => f is IOrder) is IOrder obj)
+            {
+                this._link_list.Remove(obj);
+            }
+            this._link_list.Add(this);
+        }
+
+        public override string ToThisSQL()
         {
             List<string> sql_list = new List<string>();
             foreach (var field in _order_dic.Keys)
@@ -34,36 +55,48 @@ namespace common.SqlMaker.Impl.Mssql
                 }
                 else
                 {
-                    sql_list.Add($"{field} DESC");
+                    sql_list.Add($"[{field}] DESC");
                 }
             }
-            return SpliceSQL("ORDER BY " + string.Join(",", sql_list));
+            return "ORDER BY " + string.Join(",", sql_list);
+        }
+
+        private IOrder MakeLink(Action<OrderImpl<T>> func)
+        {
+            //构造新链，传递给下一个
+            OrderImpl<T> sel = new OrderImpl<T>(this);
+            func.Invoke(sel);
+            return sel;
         }
 
         IOrder IOrder.OrderByAsc(string field)
         {
-            if (_order_dic.ContainsKey(field))
+            return MakeLink(f =>
             {
-                _order_dic.Remove(field);
-            }
-            _order_dic.Add(field, true);
-            return this;
+                if (f._order_dic.ContainsKey(field))
+                {
+                    f._order_dic.Remove(field);
+                }
+                f._order_dic.Add(field, true);
+            });
         }
 
 
         IOrder IOrder.OrderByDesc(string field)
         {
-            if (_order_dic.ContainsKey(field))
+            return MakeLink(f =>
             {
-                _order_dic.Remove(field);
-            }
-            _order_dic.Add(field, false);
-            return this;
+                if (f._order_dic.ContainsKey(field))
+                {
+                    f._order_dic.Remove(field);
+                }
+                f._order_dic.Add(field, false);
+            });
         }
 
-        IPager IOrder.Pager(int passcount, int count)
+        IPager IOrder.Pager(int page_index, int page_size)
         {
-            return new PagerImpl<T>(ToSQL(), passcount, count);
+            return new PagerImpl<T>(_link_list, page_index, page_size);
         }
     }
 }

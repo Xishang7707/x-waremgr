@@ -1,5 +1,8 @@
 ﻿using common.SqlMaker.Impl.Base;
 using common.SqlMaker.Interface;
+using common.SqlMaker.Interface.Base;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace common.SqlMaker.Impl.Mssql
 {
@@ -19,22 +22,21 @@ namespace common.SqlMaker.Impl.Mssql
         /// </summary>
         private int _count;
 
-        /// <summary>
-        /// 分页
-        /// </summary>
-        /// <param name="sql">前置SQL</param>
-        /// <param name="passcount">跳过数量</param>
-        /// <param name="count">取数量</param>
-        public PagerImpl(string sql, int passcount, int count)
+        public PagerImpl(List<ISqlBase> _link, int page_index, int page_size) : base(_link)
         {
-            SpliceSQL(sql);
-            _passcount = passcount;
-            _count = count;
+            _passcount = (page_index - 1) * page_size;
+            _count = page_size;
+
+            if (this._link_list.FirstOrDefault(f => f is IPager) is IPager obj)
+            {
+                this._link_list.Remove(obj);
+            }
+            this._link_list.Add(this);
         }
 
-        public override string ToSQL()
+        public override string ToThisSQL()
         {
-            return SpliceSQL($@"OFFSET {_passcount} ROWS FETCH NEXT {_count} ROWS ONLY");
+            return $@"OFFSET {_passcount} ROWS FETCH NEXT {_count} ROWS ONLY";
         }
     }
 }

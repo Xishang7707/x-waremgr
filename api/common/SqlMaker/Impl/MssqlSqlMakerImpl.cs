@@ -9,7 +9,17 @@ namespace common.SqlMaker.Impl
     /// </summary>
     class MssqlSqlMakerImpl : ISqlMaker
     {
-        public ISelect<T> Top<T>(Func<T, dynamic> selector = null) where T : new()
+        public IWhere<T> MakeUpdate<T>(IDelete<T> _v) where T : new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IWhere<T> MakeWhere<T>(ISelect<T> _v) where T : new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IWhere<T> MakeWhere<T>(IUpdate<T> _v) where T : new()
         {
             throw new NotImplementedException();
         }
