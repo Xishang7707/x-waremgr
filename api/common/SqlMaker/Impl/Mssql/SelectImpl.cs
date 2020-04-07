@@ -24,28 +24,34 @@ namespace common.SqlMaker.Impl.Mssql
         /// </summary>
         protected string _count_sql;
 
+        public SelectImpl()
+        {
+            _link_list.Add(this);
+            _select_cols = new T();
+        }
+
         public SelectImpl(Func<T, dynamic> selector)
         {
+            _link_list.Add(this);
             if (selector == null)
             {
-                _select_cols = new T();
                 return;
             }
 
             _select_cols = selector.Invoke(new T());
-            //Type ty = _select_cols.GetType();
-            //if (!ty.Name.StartsWith("<>") && ty.FullName != _dt_type.FullName)
-            //{
-            //    throw new TypeErrorException(ty, "匿名类型或者" + _dt_type.FullName);
-            //}
-            _link_list.Add(this);
         }
 
-        private SelectImpl(SelectImpl<T> obj)
+        private SelectImpl(SelectImpl<T> obj) : base(obj._link_list)
         {
             this._select_cols = obj._select_cols;
             this._top_sql = obj._top_sql;
             this._count_sql = obj._count_sql;
+
+            if (this._link_list.FirstOrDefault(f => f is ISelect<T>) is ISelect<T> _sel)
+            {
+                this._link_list.Remove(_sel);
+            }
+            this._link_list.Add(this);
         }
 
         public ISelect<T> Count(string col)
@@ -72,9 +78,23 @@ namespace common.SqlMaker.Impl.Mssql
         /// <returns></returns>
         public override string ToThisSQL()
         {
-            Type ty = _select_cols.GetType();
-            IEnumerable<string> select_cols = ty.GetProperties().Select(s => $"[{s.Name}]");
-            return $"SELECT {_top_sql} {_count_sql} {string.Join(",", select_cols)} FROM [{_dt_type.Name}]";
+            string sql = "SELECT";
+            IEnumerable<string> select_cols = null;
+            if (_select_cols != null)
+            {
+                Type ty = _select_cols.GetType();
+                select_cols = ty.GetProperties().Select(s => $"[{s.Name}]");
+            }
+
+            sql += string.IsNullOrWhiteSpace(_top_sql) ? "" : $" {_top_sql}";
+            sql += string.IsNullOrWhiteSpace(_count_sql) ? "" : $" {_count_sql}";
+
+            if (select_cols != null)
+            {
+                sql += $" {string.Join(",", select_cols)}";
+            }
+
+            return $"{sql} FROM [{_dt_type.Name}]";
         }
 
         public IWhere<T> Where(string key, string rel, object val)

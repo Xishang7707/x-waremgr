@@ -9,19 +9,9 @@ namespace common.SqlMaker.Impl
     /// </summary>
     class MssqlSqlMakerImpl : ISqlMaker
     {
-        public IWhere<T> MakeUpdate<T>(IDelete<T> _v) where T : new()
+        public ISelect<T> Select<T>() where T : new()
         {
-            throw new NotImplementedException();
-        }
-
-        public IWhere<T> MakeWhere<T>(ISelect<T> _v) where T : new()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IWhere<T> MakeWhere<T>(IUpdate<T> _v) where T : new()
-        {
-            throw new NotImplementedException();
+            return new SelectImpl<T>();
         }
 
         IDelete<T> ISqlMaker.Delete<T>()

@@ -11,9 +11,16 @@ namespace common.SqlMaker.Interface
         /// 查询
         /// </summary>
         /// <typeparam name="T">实体类</typeparam>
+        /// <returns></returns>
+        ISelect<T> Select<T>() where T : new();
+
+        /// <summary>
+        /// 查询
+        /// </summary>
+        /// <typeparam name="T">实体类</typeparam>
         /// <param name="selector">列</param>
         /// <returns></returns>
-        ISelect<T> Select<T>(Func<T, dynamic> selector = null) where T : new();
+        ISelect<T> Select<T>(Func<T, dynamic> selector) where T : new();
 
         /// <summary>
         /// 更新

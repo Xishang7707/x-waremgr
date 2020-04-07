@@ -9,6 +9,11 @@ namespace common.SqlMaker.Impl
     /// </summary>
     class MysqlSqlMakerImpl : ISqlMaker
     {
+        public ISelect<T> Select<T>() where T : new()
+        {
+            return new SelectImpl<T>();
+        }
+
         IDelete<T> ISqlMaker.Delete<T>()
         {
             return new DeleteImpl<T>();
