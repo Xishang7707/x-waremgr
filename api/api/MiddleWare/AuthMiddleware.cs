@@ -42,7 +42,7 @@ namespace api.MiddleWare
                 {
                     code = ErrorCodeConst.ERROR_500,
                     status = ErrorCodeConst.ERROR_403,
-                    ex = ex.Message
+                    ex = JsonConvert.SerializeObject(ex)
                 };
                 await context.Response.WriteBodyAsync(res);
             }
