@@ -28,8 +28,9 @@ namespace api.Servers.PositionServer.Interface
         /// <summary>
         /// @xis 获取职位信息
         /// </summary>
+        /// <param name="selector">列选择器</param>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<t_position> GetPosition(int id);
+        Task<t_position> GetPosition(Func<t_position, dynamic> selector, int id);
     }
 }

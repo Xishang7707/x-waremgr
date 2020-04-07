@@ -6,6 +6,7 @@ using common.Consts;
 using common.DB.Interface;
 using models.db_models;
 using models.enums;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace api.Servers.DepartmentServer.Impl
             if (reqmodel.Data.department_parent != null)
             {
                 string sql_exist_parent = g_sqlMaker.Select<t_department>(s => s.id)
-                    .Where("id=@id")
+                    .Where("id", "=", "@id")
                     .ToSQL();
                 bool exist_parent_flag = await g_dbHelper.QueryAsync<int>(sql_exist_parent, new { id = reqmodel.Data.department_parent.Value }) != 0;
                 if (!exist_parent_flag)
@@ -69,7 +70,7 @@ namespace api.Servers.DepartmentServer.Impl
             string sql_update = g_sqlMaker.Update<t_department>(u => new
             {
                 u.state,
-            }).Where("id=@id and state=@state")
+            }).Where("id", "=", "@id").And("state", "=", "@state")
                 .ToSQL();
 
 
@@ -88,7 +89,7 @@ namespace api.Servers.DepartmentServer.Impl
         public async Task<Result<IEnumerable<DepartmentResult>>> GetAllDepartmentDeps()
         {
             //顶级部门
-            string sql_select_top = g_sqlMaker.Select<t_department>().Where("department_parent=@department_parent and status=@status and state=@state").ToSQL();
+            string sql_select_top = g_sqlMaker.Select<t_department>().Where("department_parent", "=", "@department_parent").And("status", "=", "@status").And("state", "=", "@state").ToSQL();
 
             //获取下级部门
             async Task<IEnumerable<DepartmentResult>> GetChildDepartmentDeps(int? id)
@@ -121,7 +122,7 @@ namespace api.Servers.DepartmentServer.Impl
 
         public async Task<Result<IEnumerable<DepartmentResult>>> GetAllDepartments()
         {
-            string sql_select = g_sqlMaker.Select<t_department>().Where("status=@status and state=@state").ToSQL();
+            string sql_select = g_sqlMaker.Select<t_department>().Where("status", "=", "@status").And("state", "=", "@state").ToSQL();
 
             List<DepartmentResult> result_list = new List<DepartmentResult>();
             List<t_department> depart_list = await g_dbHelper.QueryListAsync<t_department>(sql_select, new { status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
@@ -139,9 +140,15 @@ namespace api.Servers.DepartmentServer.Impl
             return result;
         }
 
-        public async Task<t_department> GetDepartment(int id)
+        /// <summary>
+        /// @xis 获取部门信息
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<t_department> GetDepartment(Func<t_department, dynamic> selector, int id)
         {
-            string sql_select = g_sqlMaker.Select<t_department>().Where("id=@id").ToSQL();
+            string sql_select = g_sqlMaker.Select(selector).Where("id", "=", "@id").ToSQL();
             return await g_dbHelper.QueryAsync<t_department>(sql_select, new { id });
         }
     }

@@ -62,5 +62,18 @@ namespace api.Controllers
             IStockServer stockServer = new StockServerImpl();
             return await stockServer.SearchStockAsync(reqmodel);
         }
+
+        /// <summary>
+        /// @xis 搜索入库单
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet("searchstockinpaginer")]
+        public async Task<IActionResult> SearchStockInPaginer([FromQuery]SearchStockInModel model)
+        {
+            reqmodel<SearchStockInModel> reqmodel = await RequestPackingAsync(model);
+            IStockServer stockServer = new StockServerImpl();
+            return await stockServer.SearchStockInPaginerAsync(reqmodel);
+        }
     }
 }

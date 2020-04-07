@@ -1,12 +1,19 @@
 ﻿using api.requests;
 using api.responses;
+using api.Servers.AuditServer.Impl;
+using api.Servers.AuditServer.Interface;
+using api.Servers.DepartmentServer.Impl;
+using api.Servers.DepartmentServer.Interface;
 using api.Servers.FactoryServer.Impl;
 using api.Servers.FactoryServer.Interface;
 using api.Servers.ProductServer.Impl;
 using api.Servers.ProductServer.Interface;
 using api.Servers.StockServer.Interface;
+using api.Servers.UserServer.Impl;
+using api.Servers.UserServer.Interface;
 using common;
 using common.Consts;
+using common.SqlMaker.Interface;
 using models.db_models;
 using models.enums;
 using Newtonsoft.Json;
@@ -226,7 +233,8 @@ namespace api.Servers.StockServer.Impl
                 g_logServer.Log(modelname, "入库审批失败", $"用户：{reqmodel.User.user_name},订单号：{stock_in.order_sn}，订单被驳回", EnumLogType.Info);
                 return result;
             }
-            int? next_applyer = GetNextApplyer(EnumOrderType.IN, stock_in.department_id, stock_in.apply_process);
+            IAuditServer auditServer = new AuditServerImpl(g_dbHelper, g_logServer);
+            int? next_applyer = auditServer.GetNextApplyer(EnumOrderType.IN, stock_in.department_id, stock_in.apply_process);
             if (next_applyer == null)
             {
                 result.code = ErrorCodeConst.ERROR_1030;
@@ -275,7 +283,7 @@ namespace api.Servers.StockServer.Impl
                 }
 
                 //最后一步或者拒绝则更新审批状态
-                EnumApplyStepFlag step_flag = GetApplyStepFlag(EnumOrderType.IN, stock_in.department_id, reqmodel.User.position_id);
+                EnumApplyStepFlag step_flag = auditServer.GetApplyStepFlag(EnumOrderType.IN, stock_in.department_id, reqmodel.User.position_id);
                 if (step_flag == EnumApplyStepFlag.End || stock_in.apply_status == (int)EnumApplyStatus.Reject)
                 {
                     update_stock_in_flag = await UpdateStockInByOrderSn(u => new { u.apply_status, u.apply_process }, stock_in);
@@ -319,60 +327,6 @@ namespace api.Servers.StockServer.Impl
             result.status = ErrorCodeConst.ERROR_200;
             g_logServer.Log(modelname, "入库审批成功", $"用户：{reqmodel.User.user_name},订单号：{stock_in.order_sn}", models.enums.EnumLogType.Info);
             return result;
-        }
-
-        /// <summary>
-        /// @xis 获取下一个审批者
-        /// </summary>
-        /// <param name="_ot">订单类型</param>
-        /// <param name="_depart">申请部门</param>
-        /// <param name="_cur_position">当前已审批的职位</param>
-        /// <returns>
-        /// null：获取失败
-        /// -1：已达末尾
-        /// </returns>
-        public int? GetNextApplyer(EnumOrderType _ot, int _depart, int _cur_position)
-        {
-            JObject process_json = CommonConfig.ProcessConfig[_ot.ToString()] as JObject;
-            if (process_json == null)
-            {
-                return null;
-            }
-
-            List<int> process_list = JsonConvert.DeserializeObject<List<int>>(process_json[$"d_{_depart}"].ToString());//流程列表
-            if (process_list == null)
-            {
-                return null;
-            }
-
-            int cur_index = process_list.IndexOf(_cur_position);
-            //不存在或达末尾
-            if (cur_index == -1 || cur_index + 1 >= process_list.Count)
-            {
-                return null;
-            }
-
-            return process_list[cur_index + 1];
-        }
-
-        /// <summary>
-        /// @xis 审批进度 开始/进行中/末尾 EnumApplyStepFlag
-        /// </summary>
-        /// <returns></returns>
-        public EnumApplyStepFlag GetApplyStepFlag(EnumOrderType _ot, int _depart, int _cur_position)
-        {
-            List<int> process_list = JsonConvert.DeserializeObject<List<int>>(CommonConfig.ProcessConfig[_ot.ToString()][$"d_{_depart}"].ToString());
-            int cur_index = process_list.IndexOf(_cur_position);
-            if (cur_index == 0)
-            {
-                return EnumApplyStepFlag.Start;
-            }
-            if (cur_index + 1 != process_list.Count)
-            {
-                return EnumApplyStepFlag.Progress;
-            }
-
-            return EnumApplyStepFlag.End;
         }
 
         /// <summary>
@@ -678,5 +632,93 @@ namespace api.Servers.StockServer.Impl
 
             return await g_dbHelper.QueryListAsync<t_stock>(sql, new { name = $"%{name}%", quantity = 0, status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
         }
+
+        /// <summary>
+        /// @xis 搜索入库单
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        public async Task<Result> SearchStockInPaginerAsync(reqmodel<SearchStockInModel> reqmodel)
+        {
+            PaginerData<List<t_stock_in>> order_list = await GetStockHasByVagueOrderSn(s => new
+            {
+                s.in_user_id,
+                s.order_sn,
+                s.add_time,
+                s.apply_process,
+                s.apply_status,
+                s.department_id,
+                s.position_id
+            }, reqmodel.Data.order_sn, reqmodel.Data.page_index, reqmodel.Data.page_size);
+
+            Result<PaginerData<List<SearchStockInResult>>> result = new Result<PaginerData<List<SearchStockInResult>>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+            PaginerData<List<SearchStockInResult>> result_paginer = new PaginerData<List<SearchStockInResult>> { page_index = order_list.page_index, page_size = order_list.page_size, page_total = order_list.page_total, total = order_list.total, Data = new List<SearchStockInResult>() };
+            IAuditServer auditServer = new AuditServerImpl(g_dbHelper, g_logServer);
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
+            IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
+            foreach (var item in order_list.Data)
+            {
+                t_user user_model = await userServer.GetUserById(s => new { s.real_name, s.job_number }, item.in_user_id);
+                t_department depart_model = await departmentServer.GetDepartment(s => new { s.department_name }, item.department_id);
+                result_paginer.Data.Add(new SearchStockInResult
+                {
+                    add_time = item.add_time.Value.ToString("yyyy-MM-dd hh:mm:ss"),
+                    applyer = user_model.real_name,
+                    apply_status = item.apply_status,
+                    job_number = user_model.job_number,
+                    order_sn = item.order_sn,
+                    depart_name = depart_model.department_name,
+                    audit_list = await auditServer.GetApplyLogByOrderSnAsync(EnumOrderType.IN, item.order_sn, item.department_id, item.position_id)
+                });
+            }
+            result.data = result_paginer;
+            return result;
+        }
+
+        /// <summary>
+        /// @xis 模糊查询入库单
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="order_sn">订单号</param>
+        /// <param name="page_index">页码</param>
+        /// <param name="page_size">数量</param>
+        /// <returns></returns>
+        public async Task<PaginerData<List<t_stock_in>>> GetStockHasByVagueOrderSn(Func<t_stock_in, dynamic> selector, string order_sn, int page_index, int page_size = 15)
+        {
+            ISelect<t_stock_in> select = g_sqlMaker.Select(selector);
+            ISelect<t_stock_in> select_count = g_sqlMaker.Select<t_stock_in>(null);
+            IWhere<t_stock_in> where_data;
+            IWhere<t_stock_in> where_count;
+            if (!string.IsNullOrWhiteSpace(order_sn))
+            {
+                where_data = select.Where("order_sn", "like", "@order_sn");
+                where_count = select_count.Count().Where("order_sn", "like", "@order_sn");
+            }
+            else
+            {
+                where_data = select.Where();
+                where_count = select_count.Count().Where();
+            }
+            string sql_data = where_data
+                                   .And("status", "=", "@status")
+                                   .OrderByDesc("add_time")
+                                   .Pager(page_index, page_size)
+                                   .ToSQL();
+
+            string sql_count = where_count
+                                   .And("status", "=", "@status")
+                                   .ToSQL();
+
+            PaginerData<List<t_stock_in>> paginer_data = new PaginerData<List<t_stock_in>>
+            {
+                Data = await g_dbHelper.QueryListAsync<t_stock_in>(sql_data, new { order_sn = $"%{order_sn}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal }),
+                page_index = page_index,
+                page_size = page_size,
+                total = await g_dbHelper.QueryAsync<int>(sql_count, new { order_sn = $"%{order_sn}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal })
+            };
+            paginer_data.page_total = (paginer_data.total % page_size > 0 ? 1 : 0) + paginer_data.total / page_size;
+            return paginer_data;
+        }
+
     }
 }

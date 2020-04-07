@@ -22,7 +22,7 @@ namespace api.Servers.ProductServer.Impl
         public async Task<Result> DeleteProduct(reqmodel<int> reqmodel)
         {
             Result result = new Result { code = ErrorCodeConst.ERROR_100, status = ErrorCodeConst.ERROR_403 };
-            string sql_update = g_sqlMaker.Update<t_product>(u => new { u.state }).Where($"id=@id and state={(int)EnumState.Normal}").ToSQL();
+            string sql_update = g_sqlMaker.Update<t_product>(u => new { u.state }).Where($"id", "=", "@id").And("state", "=", "@state").ToSQL();
             t_product product_model = new t_product
             {
                 id = reqmodel.Data,
@@ -46,7 +46,7 @@ namespace api.Servers.ProductServer.Impl
             {
                 s.id
             })
-            .Where("product_name=@product_name and state=@state")
+            .Where("product_name", "=", "@product_name").And("state", "=", "@state")
             .ToSQL();
             t_product product = await g_dbHelper.QueryAsync<t_product>(sql_select, new { product_name, state = (int)EnumState.Normal });
             return product != null;

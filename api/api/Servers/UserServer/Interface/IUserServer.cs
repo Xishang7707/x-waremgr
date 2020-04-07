@@ -1,5 +1,6 @@
 ﻿using api.requests;
 using api.responses;
+using models.db_models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -47,5 +48,13 @@ namespace api.Servers.UserServer.Interface
         /// <param name="user"></param>
         /// <returns></returns>
         Task<bool> TokenRenewalAsync(string token, LoginResult user);
+
+        /// <summary>
+        /// @xis 获取用户
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<t_user> GetUserById(Func<t_user, dynamic> selector, int id);
     }
 }

@@ -54,8 +54,8 @@ namespace api.Servers.WareServer.Impl
         public async Task<Result> DeleteWareAsync(int id)
         {
             Result result = new Result { code = ErrorCodeConst.ERROR_1030, status = ErrorCodeConst.ERROR_403 };
-            string sql_delete = g_sqlMaker.Delete<t_ware>().Where($"id=@id and state={(int)EnumState.Normal}").ToSQL();
-            bool delete_flag = await g_dbHelper.ExecAsync(sql_delete, new { id }) > 0;
+            string sql_delete = g_sqlMaker.Delete<t_ware>().Where($"id", "=", "@id").And("state", "=", "@state").ToSQL();
+            bool delete_flag = await g_dbHelper.ExecAsync(sql_delete, new { id, state = (int)EnumState.Normal }) > 0;
             if (!delete_flag)
             {
                 result.code = ErrorCodeConst.ERROR_1030;
@@ -69,7 +69,7 @@ namespace api.Servers.WareServer.Impl
 
         public async Task<Result<IEnumerable<WareResult>>> GetAllWares()
         {
-            string sql_select = g_sqlMaker.Select<t_ware>().Where("status=@status and state=@state").ToSQL();
+            string sql_select = g_sqlMaker.Select<t_ware>().Where("status", "=", "@status").And("state", "=", "@state").ToSQL();
             List<t_ware> data_list = await g_dbHelper.QueryListAsync<t_ware>(sql_select, new { status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
             List<WareResult> result_list = new List<WareResult>();
             foreach (var item in data_list)

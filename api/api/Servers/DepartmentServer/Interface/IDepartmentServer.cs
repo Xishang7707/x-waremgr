@@ -42,8 +42,9 @@ namespace api.Servers.DepartmentServer.Interface
         /// <summary>
         /// @xis 获取部门信息
         /// </summary>
+        /// <param name="selector">列选择器</param>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<t_department> GetDepartment(int id);
+        Task<t_department> GetDepartment(Func<t_department, dynamic> selector, int id);
     }
 }

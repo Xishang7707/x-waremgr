@@ -31,9 +31,9 @@ namespace api.Servers.PositionServer.Impl
             return model != null;
         }
 
-        public async Task<t_position> GetPosition(int id)
+        public async Task<t_position> GetPosition(Func<t_position, dynamic> selector, int id)
         {
-            string sql_select = g_sqlMaker.Select<t_position>().Where("id", "=", "@id").ToSQL();
+            string sql_select = g_sqlMaker.Select(selector).Where("id", "=", "@id").ToSQL();
             return await g_dbHelper.QueryAsync<t_position>(sql_select, new { id });
         }
     }

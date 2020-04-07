@@ -184,12 +184,8 @@ namespace api.Servers.UserServer.Impl
         /// <returns></returns>
         public async Task<Result> LoginAsync(reqmodel<LoginModel> reqmodel)
         {
-            //验证用户名是否存在
             const string modelname = "UserServerImpl.LoginAsync";
-            //ILogServer logServer = new LogServerImpl();
             Result<LoginResult> result = new Result<LoginResult> { status = ErrorCodeConst.ERROR_403, code = ErrorCodeConst.ERROR_100 };
-            //IDbHelper dbHelper = new DBHelper("main");
-            //ISqlMaker sqlMaker = SqlMakerFactory.GetSqlMaker(dbHelper.GetDBType());
 
             string sql_user_select = g_sqlMaker.Select<t_user>(s => new
             {
@@ -201,10 +197,10 @@ namespace api.Servers.UserServer.Impl
                 s.position_id
             })
                 .Where($"user_name", "=", "@user_name")
-                .And("state", "=", (int)EnumState.Normal)
+                .And("state", "=", "@state")
                 .ToSQL();
 
-            t_user user = await g_dbHelper.QueryAsync<t_user>(sql_user_select, new { reqmodel.Data.user_name });
+            t_user user = await g_dbHelper.QueryAsync<t_user>(sql_user_select, new { reqmodel.Data.user_name, state = (int)EnumState.Normal });
             if (user == null)
             {
                 g_logServer.Log(modelname, "登录失败", new { msg = $"用户名:{reqmodel.Data.user_name}" }, EnumLogType.Debug);
@@ -222,7 +218,7 @@ namespace api.Servers.UserServer.Impl
 
             //获取职位信息
             IPositionServer positionServer = new PositionServerImpl(g_dbHelper, g_logServer);
-            t_position position_model = await positionServer.GetPosition(user.position_id);
+            t_position position_model = await positionServer.GetPosition(s => new { s.id, s.position_name, s.department_id }, user.position_id);
             if (position_model == null)
             {
                 g_logServer.Log(modelname, "登录失败", new { msg = $"用户名:{reqmodel.Data.user_name},获取职位信息失败" }, EnumLogType.Debug);
@@ -232,7 +228,7 @@ namespace api.Servers.UserServer.Impl
 
             //获取部门信息
             IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
-            t_department depart_model = await departmentServer.GetDepartment(position_model.department_id);
+            t_department depart_model = await departmentServer.GetDepartment(s => new { s.id, s.department_name }, position_model.department_id);
             if (depart_model == null)
             {
                 g_logServer.Log(modelname, "登录失败", new { msg = $"用户名:{reqmodel.Data.user_name},获取部门信息失败" }, EnumLogType.Debug);
@@ -309,6 +305,12 @@ namespace api.Servers.UserServer.Impl
         public async Task<bool> TokenRenewalAsync(string token, LoginResult user)
         {
             return await RedisHelper.Instance.SetStringKeyAsync(RedisPrefix + token, user, TimeSpan.FromSeconds(ConstFlag.UserExpireTime));
+        }
+
+        public async Task<t_user> GetUserById(Func<t_user, dynamic> selector, int id)
+        {
+            string sql = g_sqlMaker.Select(selector).Where("id", "=", "@id").ToSQL();
+            return await g_dbHelper.QueryAsync<t_user>(sql, new { id });
         }
     }
 }
