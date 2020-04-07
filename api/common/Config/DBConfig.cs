@@ -25,7 +25,8 @@ namespace common.Config
                     ActionType = (EnumDBActionType)int.Parse(item["action_type"].ToString()),
                 });
             }
-            DBConfig db = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? Get("main_origin") : Get("main");
+            //DBConfig db = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? Get("main_origin") : Get("main");
+            DBConfig db = Get("main_origin");
             this.Tag = db.Tag;
             this.Conn = db.Conn;
             this.DbType = db.DbType;
