@@ -30,7 +30,11 @@ namespace common.Config
             this.Conn = db.Conn;
             this.DbType = db.DbType;
             this.ActionType = db.ActionType;
+
+            Instance = this;
         }
+
+        public static DBConfig Instance { get; private set; }
 
         /// <summary>
         /// 连接标签

@@ -69,45 +69,42 @@ namespace api.Servers.UserServer.Impl
         public async Task<Result> AddUserAsync(reqmodel<RegisterModel> reqmodel)
         {
             const string modelname = "UserServerImpl.AddUserAsync";
-            ILogServer logServer = new LogServerImpl();
             Result result = new Result { status = ErrorCodeConst.ERROR_403, code = ErrorCodeConst.ERROR_100 };
-            IDbHelper dbHelper = new DBHelper("main");
-            ISqlMaker sqlMaker = SqlMakerFactory.GetSqlMaker(dbHelper.GetDBType());
 
             //检查用户名是否存在
-            string sql_user_name_exist = sqlMaker.Select<t_user>(s => new { s.id })
+            string sql_user_name_exist = g_sqlMaker.Select<t_user>(s => new { s.id })
                 .Where("user_name", "=", "@user_name")
                 .And("state", "=", (int)EnumState.Normal)
                 .ToSQL();
 
             try
             {
-                dbHelper.Transaction();
+                g_dbHelper.Transaction();
                 //检查用户名是否存在
-                t_user user = await dbHelper.QueryAsync<t_user>(sql_user_name_exist, new { reqmodel.Data.user_name });
+                t_user user = await g_dbHelper.QueryAsync<t_user>(sql_user_name_exist, new { reqmodel.Data.user_name });
                 if (user != null && user.id != 0)
                 {
-                    dbHelper.Rollback();
-                    logServer.Log(modelname, "添加用户失败", new { msg = $"用户名{reqmodel.Data.user_name}已存在" }, EnumLogType.Info);
+                    g_dbHelper.Rollback();
+                    g_logServer.Log(modelname, "添加用户失败", new { msg = $"用户名{reqmodel.Data.user_name}已存在" }, EnumLogType.Info);
                     result.code = ErrorCodeConst.ERROR_1005;
                     return result;
                 }
 
                 //职位
-                IPositionServer positionServer = new PositionServerImpl(dbHelper);
+                IPositionServer positionServer = new PositionServerImpl(g_dbHelper, g_logServer);
 
                 if (!int.TryParse(reqmodel.Data.position_id, out int position_id))
                 {
-                    dbHelper.Rollback();
-                    logServer.Log(modelname, "添加用户失败", new { msg = $"parse position_id fail" }, EnumLogType.Info);
+                    g_dbHelper.Rollback();
+                    g_logServer.Log(modelname, "添加用户失败", new { msg = $"parse position_id fail" }, EnumLogType.Info);
                     result.code = ErrorCodeConst.ERROR_1020;
                     return result;
                 }
 
                 if (!await positionServer.ExistPositionAsync(position_id))
                 {
-                    dbHelper.Rollback();
-                    logServer.Log(modelname, "添加用户失败", new { msg = $"position_id not exist" }, EnumLogType.Info);
+                    g_dbHelper.Rollback();
+                    g_logServer.Log(modelname, "添加用户失败", new { msg = $"position_id not exist" }, EnumLogType.Info);
                     result.code = ErrorCodeConst.ERROR_1020;
                     return result;
                 }
@@ -121,12 +118,12 @@ namespace api.Servers.UserServer.Impl
                     state = 1
                 };
 
-                string sql_user_insert = sqlMaker.Insert<t_user>(i => new { i.user_name, i.real_name, i.position_id, i.state, i.status }).ToSQL();
-                user.id = await dbHelper.ExecScalarAsync<int>(sql_user_insert, user);
+                string sql_user_insert = g_sqlMaker.Insert<t_user>(i => new { i.user_name, i.real_name, i.position_id, i.state, i.status }).ToSQL();
+                user.id = await g_dbHelper.ExecScalarAsync<int>(sql_user_insert, user);
                 if (user.id == 0)
                 {
-                    dbHelper.Rollback();
-                    logServer.Log(modelname, "添加用户失败", new { msg = $"id=0" }, EnumLogType.Info);
+                    g_dbHelper.Rollback();
+                    g_logServer.Log(modelname, "添加用户失败", new { msg = $"id=0" }, EnumLogType.Info);
                     result.code = ErrorCodeConst.ERROR_1018;
                     return result;
                 }
@@ -135,7 +132,7 @@ namespace api.Servers.UserServer.Impl
                 user.salt = MakeUserSalt();
                 user.log_pwd = EncPassword(user.id, reqmodel.Data.log_pwd, user.salt);
 
-                string sql_user_update = sqlMaker.Update<t_user>(u => new
+                string sql_user_update = g_sqlMaker.Update<t_user>(u => new
                 {
                     u.salt,
                     u.log_pwd
@@ -143,35 +140,35 @@ namespace api.Servers.UserServer.Impl
                 .Where("id", "=", "@id")
                 .And("state", "=", (int)EnumState.Normal)
                 .ToSQL();
-                if (await dbHelper.ExecAsync(sql_user_update, user) <= 0)
+                if (await g_dbHelper.ExecAsync(sql_user_update, user) <= 0)
                 {
-                    dbHelper.Rollback();
-                    logServer.Log(modelname, "添加用户失败", new { msg = $"update pwd fail" }, EnumLogType.Info);
+                    g_dbHelper.Rollback();
+                    g_logServer.Log(modelname, "添加用户失败", new { msg = $"update pwd fail" }, EnumLogType.Info);
                     result.code = ErrorCodeConst.ERROR_1018;
                     return result;
                 }
 
                 //权限
-                IPrivilegeServer privilegeServer = new PrivilegeServerImpl(dbHelper, logServer);
+                IPrivilegeServer privilegeServer = new PrivilegeServerImpl(g_dbHelper, g_logServer);
                 List<t_position_privilege_relation> privilege_list = await privilegeServer.GetPrivilegesByPositionIdAsync(user.id);
                 if (!await privilegeServer.SetUserPrivileges(user.id, privilege_list.Select(s => s.privilege_key)))
                 {
-                    dbHelper.Rollback();
-                    logServer.Log(modelname, "添加用户失败", new { msg = $"insert privilege fail" }, EnumLogType.Info);
+                    g_dbHelper.Rollback();
+                    g_logServer.Log(modelname, "添加用户失败", new { msg = $"insert privilege fail" }, EnumLogType.Info);
                     result.code = ErrorCodeConst.ERROR_1018;
                     return result;
                 }
-                dbHelper.Commit();
+                g_dbHelper.Commit();
 
-                logServer.Log(modelname, "添加用户成功", new { msg = $"用户名:{reqmodel.Data.user_name}" }, EnumLogType.Info);
+                g_logServer.Log(modelname, "添加用户成功", new { msg = $"用户名:{reqmodel.Data.user_name}" }, EnumLogType.Info);
                 result.code = ErrorCodeConst.ERROR_1019;
                 result.status = ErrorCodeConst.ERROR_200;
                 return result;
             }
             catch (Exception ex)
             {
-                dbHelper.Rollback();
-                logServer.Log(modelname, "添加用户异常", JsonConvert.SerializeObject(ex), EnumLogType.Error);
+                g_dbHelper.Rollback();
+                g_logServer.Log(modelname, "添加用户异常", JsonConvert.SerializeObject(ex), EnumLogType.Error);
                 result.code = ErrorCodeConst.ERROR_1018;
             }
             return result;
