@@ -38,11 +38,11 @@ namespace api.Servers.DepartmentServer.Impl
             string sql_insert = null;
             if (has_parent)
             {
-                sql_insert = g_sqlMaker.Insert<t_department>(i => new { i.department_name, i.department_parent, i.state, i.status }).ToSQL();
+                sql_insert = g_sqlMaker.Insert<t_department>(i => new { i.department_name, i.department_parent, i.state, i.status, i.add_time }).ToSQL();
             }
             else
             {
-                sql_insert = g_sqlMaker.Insert<t_department>(i => new { i.department_name, i.state, i.status }).ToSQL();
+                sql_insert = g_sqlMaker.Insert<t_department>(i => new { i.department_name, i.state, i.status, i.add_time }).ToSQL();
             }
 
             t_department department_model = new t_department

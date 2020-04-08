@@ -16,3 +16,6 @@
 /db
 /api/api/.config
 /api/api/Properties
+/web/.vs
+/web/bin
+/web/obj

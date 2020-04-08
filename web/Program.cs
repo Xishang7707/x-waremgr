@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using api.Configs;
-using common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using web.common;
 
-namespace api
+namespace web
 {
     public class Program
     {
@@ -21,12 +15,11 @@ namespace api
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            GConfig.Init(PConfig.AppSettingPath);
-            new ConfigurationBuilder().AddJsonFile(PConfig.AppSettingPath).AddEnvironmentVariables().Build();
+            IConfigurationRoot conf = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+            new ProgramConfig(conf);
             return Host.CreateDefaultBuilder(args)
                    .ConfigureWebHostDefaults(webBuilder =>
                    {
-                       webBuilder.UseUrls(GConfig.UrlConfig.ApiPort);
                        webBuilder.UseStartup<Startup>();
                    });
         }
