@@ -11,9 +11,47 @@
     <meta name="viewport" content="width=device-width" />
     <title>登录</title>
     <link href="~/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/layui/layui.js"></script>
     <script src="~/js/bootstrap.js"></script>
+    <script src="~/js/js.cookie.min.js"></script>
+    <script src="~/js/common.js"></script>
+    <script src="~/js/login.js"></script>
+    <style>
+        html, body, .login-wap {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .login-wap {
+            background: #f99;
+        }
+
+        .login-model {
+        }
+    </style>
 </head>
 <body>
-
+    <div class="container-fiuled d-flex justify-content-center align-items-center login-wap">
+        <div class="col-3">
+            <div>
+                <div class="d-flex justify-content-center">
+                    <img src="~/images/logo.png" style="width:300px;height:109px;" />
+                </div>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="in_account" placeholder="用户名" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="in_pwd" placeholder="密码" maxlength="20">
+                    </div>
+                </form>
+                <div>
+                    <button type="button" id="btn-login" class="btn btn-primary btn-block">登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

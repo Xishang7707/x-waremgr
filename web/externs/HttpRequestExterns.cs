@@ -15,7 +15,12 @@ namespace web.externs
         /// <returns></returns>
         public static string GetToken(this HttpRequest _req)
         {
-            return _req.Headers["token"];
+            string token = _req.Cookies["x-access-s"];
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                token = _req.Cookies["x-access-s"];
+            }
+            return token;
         }
 
         /// <summary>

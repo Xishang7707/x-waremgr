@@ -41,7 +41,7 @@ namespace api.MiddleWare
                 ExceptionResult res = new ExceptionResult
                 {
                     code = ErrorCodeConst.ERROR_500,
-                    status = ErrorCodeConst.ERROR_403,
+                    status = ErrorCodeConst.ERROR_500,
                     ex = JsonConvert.SerializeObject(ex)
                 };
                 await context.Response.WriteBodyAsync(res);

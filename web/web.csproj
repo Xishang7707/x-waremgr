@@ -5,6 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\common.js" />
+    <None Include="wwwroot\js\js.cookie.min.js" />
+    <None Include="wwwroot\js\login.js" />
     <None Include="wwwroot\js\site.js" />
   </ItemGroup>
 

@@ -40,7 +40,7 @@ namespace web.PageModels
                     //--更换为权限验证
                     if (!(await VerifyUser(context)))
                     {
-                        context.Response.Redirect("/other/error_405", false);
+                        context.Response.Redirect("/login", false);
                         return;
                     }
                 }
@@ -60,9 +60,17 @@ namespace web.PageModels
         /// <returns></returns>
         private async Task<bool> VerifyUser(HttpContext context)
         {
-            //1.身份验证
-            LoginResult user = await HttpUtils.HttpGet<LoginResult>($"{ProgramConfig.API_HOST}/api/user/getuserinfo", _token: context.Request.GetToken(), _lang: context.Request.GetLang());
-            if (user == null)
+            try
+            {
+                //1.身份验证
+                Result<LoginResult> res = await HttpUtils.HttpGet<Result<LoginResult>>($"{ProgramConfig.API_HOST}/api/user/getuserinfo", _token: context.Request.GetToken(), _lang: context.Request.GetLang());
+
+                if (res == null || res.status != "200")
+                {
+                    return false;
+                }
+            }
+            catch
             {
                 return false;
             }
