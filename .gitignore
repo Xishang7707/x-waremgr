@@ -19,3 +19,8 @@
 /web/.vs
 /web/bin
 /web/obj
+/auto/.vs
+/auto/bin
+/auto/common/bin
+/auto/common/obj
+/auto/obj

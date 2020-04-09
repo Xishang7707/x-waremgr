@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="common\**" />
+    <Compile Remove="models\**" />
+    <Content Remove="common\**" />
+    <Content Remove="models\**" />
+    <EmbeddedResource Remove="common\**" />
+    <EmbeddedResource Remove="models\**" />
+    <None Remove="common\**" />
+    <None Remove="models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\api\models\models.csproj" />
+    <ProjectReference Include="common\common.csproj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
+</Project>
