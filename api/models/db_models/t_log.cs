@@ -15,6 +15,11 @@ namespace models.db_models
         public int id { get; set; }
 
         /// <summary>
+        /// 模块
+        /// </summary>
+        public string model { get; set; }
+
+        /// <summary>
         /// 标题
         /// </summary>
         public string title { get; set; }
@@ -28,6 +33,11 @@ namespace models.db_models
         /// 日志类型
         /// </summary>
         public int type { get; set; }
+
+        /// <summary>
+        /// 产生时间
+        /// </summary>
+        public DateTime make_time { get; set; }
 
         /// <summary>
         /// 添加时间

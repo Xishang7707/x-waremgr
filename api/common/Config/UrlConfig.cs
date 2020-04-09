@@ -16,6 +16,8 @@ namespace common.Config
             HtUrl = config["ht_url"].ToString();
             HtApiPort = config["ht_api_port"].ToString();
             HtApiUrl = config["ht_api_url"].ToString();
+            AutoApiUrl = config["auto_api_url"].ToString();
+            AutoApiPort = config["auto_api_port"].ToString();
         }
 
         /// <summary>
@@ -47,5 +49,15 @@ namespace common.Config
         /// 后台api地址
         /// </summary>
         public string HtApiUrl { get; set; }
+
+        /// <summary>
+        /// 自动服务地址
+        /// </summary>
+        public string AutoApiPort { get; set; }
+
+        /// <summary>
+        /// 自动服务端口
+        /// </summary>
+        public string AutoApiUrl { get; set; }
     }
 }

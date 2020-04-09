@@ -27,6 +27,11 @@ namespace api.Configs
                 if (_app_setting_path == null) _app_setting_path = Directory.GetCurrentDirectory(); return _app_setting_path;
             }
         }
+
+        /// <summary>
+        /// 日志队列
+        /// </summary>
+        public static string QUEUE_LOG = "logs";
     }
 }
 

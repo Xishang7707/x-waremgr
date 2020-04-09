@@ -33,6 +33,11 @@ namespace common
         public static CommonConfig CommonConfig { get; set; }
 
         /// <summary>
+        /// 队列配置
+        /// </summary>
+        public static QueueConfig QueueConfig { get; set; }
+
+        /// <summary>
         /// 初始化配置
         /// </summary>
         /// <param name="path"></param>
@@ -47,6 +52,7 @@ namespace common
             DBConfig = new DBConfig(o["DBConfigs"] as JArray);
             CacheConfig = new CacheConfig(o["CacheConfigs"] as JObject);
             UrlConfig = new UrlConfig(o["UrlConfigs"] as JObject);
+            QueueConfig = new QueueConfig(o["QueueConfigs"] as JObject);
         }
     }
 }

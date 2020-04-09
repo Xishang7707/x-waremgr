@@ -1,4 +1,6 @@
-﻿using api.Servers.LogServer.Interface;
+﻿using api.Configs;
+using api.Servers.LogServer.Interface;
+using common.RabbitMQ;
 using models.enums;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +14,14 @@ namespace api.Servers.LogServer.Impl
     {
         public void Log(string model, string title, string msg, EnumLogType type)
         {
-            // TODO
+            RabbitServer.Instance.SendMessage(PConfig.QUEUE_LOG, new LogData
+            {
+                data = msg,
+                make_time = DateTime.Now,
+                model = model,
+                title = title,
+                type = (int)type
+            });
         }
 
         public void Log(string model, string title, dynamic msg, EnumLogType type)
