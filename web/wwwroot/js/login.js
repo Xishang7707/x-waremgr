@@ -8,6 +8,19 @@
     btn_login.click(() => {
         login(btn_login);
     });
+
+    $('#login-out').click(() => {
+        post({
+            url: api_host + 'user/loginout',
+            success: o => {
+                location.href = 'login';
+            },
+            e: o => {
+                location.href = 'login';
+            }
+        });
+        token('');
+    })
 });
 
 function login(btn) {

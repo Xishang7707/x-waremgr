@@ -20,6 +20,7 @@ namespace web
             return Host.CreateDefaultBuilder(args)
                    .ConfigureWebHostDefaults(webBuilder =>
                    {
+                       webBuilder.UseUrls(ProgramConfig.WEB_PORT);
                        webBuilder.UseStartup<Startup>();
                    });
         }

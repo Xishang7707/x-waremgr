@@ -1,4 +1,4 @@
-﻿var api_host = 'http://127.0.0.1:7001/api/'
+﻿var api_host = 'http://8.129.167.212:7001/api/'
 
 /**
  * GET请求
@@ -43,7 +43,7 @@ function post({ url, data, async = true, success, error }) {
             success && success(o);
         },
         error: o => {
-            if (o.responseJSON['status'] != 500)
+            if (o.responseJSON && o.responseJSON['status'] != 500)
                 success && success(o.responseJSON);
             else
                 error && error(o);
