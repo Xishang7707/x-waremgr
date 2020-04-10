@@ -42,7 +42,7 @@ namespace common.SqlMaker.Impl.MySql
             IEnumerable<string> cols_value = cols.Select(s => $@"@{s}");
             cols = cols.Select(s => $@"`{s}`");
 
-            return $@"INSERT `{typeof(T).Name}`({string.Join(",", cols)}) VALUES({string.Join(",", cols_value)})";
+            return $@"INSERT `{typeof(T).Name}`({string.Join(",", cols)}) VALUES({string.Join(",", cols_value)});SELECT LAST_INSERT_ID();";
         }
     }
 }
