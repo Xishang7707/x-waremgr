@@ -33,7 +33,9 @@ namespace api.Servers.PrivilegeServer.Impl
 
         public async Task<bool> SetUserPrivileges(int user_id, IEnumerable<string> privilege_keys)
         {
+            string modelname = "PrivilegeServerImpl.SetUserPrivileges";
             string sql_delete = g_sqlMaker.Delete<t_user_privilege_relation>().Where("user_id", "=", "@user_id").ToSQL();
+            g_logServer.Log(modelname, "设置用户权限SQL", $"SQL:{sql_delete},{user_id}", EnumLogType.Debug);
             await g_dbHelper.ExecAsync(sql_delete, new { user_id });
 
             string sql_insert = g_sqlMaker.Insert<t_user_privilege_relation>(i => new
