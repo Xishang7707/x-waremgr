@@ -10,7 +10,7 @@ namespace common.SqlMaker.Impl.MySql
     class DeleteImpl<T> : SqlBase<T>, IDelete<T> where T : new()
     {
 
-        public DeleteImpl() { }
+        public DeleteImpl() { _link_list.Add(this); }
 
         public override string ToThisSQL()
         {
