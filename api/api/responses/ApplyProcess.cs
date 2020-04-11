@@ -21,6 +21,11 @@ namespace api.responses
         public int? audit_status { get; set; }
 
         /// <summary>
+        /// 审批状态 描述 EnumApplyStatus
+        /// </summary>
+        public string audit_status_desc { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string remark { get; set; }

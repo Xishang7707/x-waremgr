@@ -26,6 +26,11 @@ namespace api.responses
         public int apply_status { get; set; }
 
         /// <summary>
+        /// 审批状态 文字
+        /// </summary>
+        public string apply_status_desc { get; set; }
+
+        /// <summary>
         /// 部门名称
         /// </summary>
         public string depart_name { get; set; }
@@ -39,6 +44,11 @@ namespace api.responses
         /// 工号
         /// </summary>
         public string job_number { get; set; }
+
+        /// <summary>
+        /// 审批到的步骤 第一步(0)、第二步(1)
+        /// </summary>
+        public int audit_step_index { get; set; }
 
         /// <summary>
         /// 审批列表

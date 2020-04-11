@@ -1,4 +1,5 @@
-﻿using api.responses;
+﻿using api.Externs;
+using api.responses;
 using api.Servers.AuditServer.Interface;
 using api.Servers.LogServer.Interface;
 using api.Servers.PositionServer.Impl;
@@ -140,10 +141,11 @@ namespace api.Servers.AuditServer.Impl
                     apply_list.Add(new ApplyProcess
                     {
                         audit_status = apply_log_model.apply_status,
+                        audit_status_desc = ((EnumAuditStatus)apply_log_model.apply_status).GetDesc(),
                         audit_time = apply_log_model.add_time.Value.ToString("yyyy-MM-dd hh:mm"),
                         remark = apply_log_model.remark,
                         position_name = position_model.position_name,
-                        auditer = user_model.real_name
+                        auditer = user_model.real_name,
                     });
                 }
                 else
