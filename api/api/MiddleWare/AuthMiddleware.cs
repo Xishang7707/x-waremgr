@@ -55,7 +55,19 @@ namespace api.MiddleWare
         /// <returns></returns>
         private async Task<bool> Verify(HttpContext context)
         {
-            //1.身份验证
+            //路径验证
+            if (context.GetEndpoint() == null)
+            {
+                Result res = new Result
+                {
+                    code = ErrorCodeConst.ERROR_600,
+                    status = ErrorCodeConst.ERROR_400
+                };
+                await context.Response.WriteBodyAsync(res);
+                return false;
+            }
+
+            //身份验证
             LoginResult user = await context.Request.GetUserAsync();
             if (!await IDentityVerify(context, user))
             {
@@ -78,7 +90,7 @@ namespace api.MiddleWare
             IUserServer userServer = new UserServerImpl();
             await userServer.TokenRenewalAsync(user.token, user);
 
-            //2.验证权限
+            //验证权限
             if (!await PrivilegeVerify(context, user))
             {
                 Result res = new Result
@@ -100,7 +112,6 @@ namespace api.MiddleWare
         /// <returns></returns>
         private async Task<bool> IDentityVerify(HttpContext context, LoginResult user)
         {
-
             if (context.GetEndpoint().Metadata.Any(a => a is IAllowAnonymous))
             {
                 return true;

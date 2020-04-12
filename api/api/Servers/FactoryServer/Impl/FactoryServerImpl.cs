@@ -89,5 +89,34 @@ namespace api.Servers.FactoryServer.Impl
             string sql_select_factory = g_sqlMaker.Select(selector).Where("id", "=", "@id").And("state", "=", "@state").And("status", "=", "@status").ToSQL();
             return await g_dbHelper.QueryAsync<t_factory>(sql_select_factory, new { id, state = (int)EnumState.Normal, status = (int)EnumStatus.Enable });
         }
+
+        /// <summary>
+        /// @xis 名称模糊查询供货商
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<t_factory>> GetFactoryByVagueName(Func<t_factory, dynamic> selector, string name)
+        {
+            string sql = g_sqlMaker.Select(selector).Where("factory_name", "like", "@factory_name").And("status", "=", "@status").And("state", "=", "@state").ToSQL();
+            return await g_dbHelper.QueryListAsync<t_factory>(sql, new { factory_name = $"%{name}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
+        }
+
+        public async Task<Result> SearchFactoryDrop(reqmodel<SearchFactoryModel> reqmodel)
+        {
+            Result<List<KVItemResult<int, string>>> result = new Result<List<KVItemResult<int, string>>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+            IEnumerable<t_factory> list = await GetFactoryByVagueName(s => new { s.id, s.factory_name }, reqmodel.Data.name);
+            result.data = new List<KVItemResult<int, string>>();
+            foreach (var item in list)
+            {
+                result.data.Add(new KVItemResult<int, string>
+                {
+                    key = item.id,
+                    value = item.factory_name
+                });
+            }
+
+            return result;
+        }
     }
 }

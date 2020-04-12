@@ -50,9 +50,16 @@ namespace common.Consts
         /// 服务器错误
         /// </summary>
         public const string ERROR_500 = "500";
+
         #endregion
 
         #region 请求错误
+
+        /// <summary>
+        /// 未知请求
+        /// </summary>
+        public const string ERROR_600 = "600";
+
         /// <summary>
         /// 未登录
         /// </summary>

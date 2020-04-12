@@ -34,7 +34,7 @@ namespace api.Controllers
         }
 
         /// <summary>
-        /// @xis 删除部门 2020-3-28 12:36:50
+        /// @xis 删除供货商 2020-3-28 12:36:50
         /// </summary>
         /// <returns></returns>
         [HttpPost("deletefactory")]
@@ -47,5 +47,18 @@ namespace api.Controllers
             return await factoryServer.DeleteFactory(reqmodel);
         }
 
+        /// <summary>
+        /// @xis 搜索供货商-下拉 2020-3-28 12:36:50
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("searchfactorydrop")]
+        //[Privilege("searchfactorydrop")]
+        public async Task<IActionResult> SearchFactoryDrop([FromQuery]SearchFactoryModel model)
+        {
+            reqmodel<SearchFactoryModel> reqmodel = await RequestPackingAsync(model);
+            IFactoryServer factoryServer = new FactoryServerImpl();
+
+            return await factoryServer.SearchFactoryDrop(reqmodel);
+        }
     }
 }
