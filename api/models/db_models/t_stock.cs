@@ -119,6 +119,6 @@ namespace models.db_models
         /// </summary>
         public int factory_id { get; set; }
 
-        public byte[] rv { get; set; }
+        public dynamic rv { get; set; }
     }
 }
