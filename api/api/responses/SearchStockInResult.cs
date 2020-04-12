@@ -51,6 +51,11 @@ namespace api.responses
         public int audit_step_index { get; set; }
 
         /// <summary>
+        /// 是否可以审批操作
+        /// </summary>
+        public bool op_audit { get; set; }
+
+        /// <summary>
         /// 审批列表
         /// </summary>
         public IEnumerable<ApplyProcess> audit_list { get; set; }

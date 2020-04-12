@@ -132,16 +132,7 @@ namespace api.Servers.AuditServer.Impl
             List<int> process_list = GetApplyList(_ot, _depart, _start_position).ToList();//流程列表
 
             int index = process_list.IndexOf(_cur_audited_position);
-            if (index == -1)
-            {
-                return 0;
-            }
-
-            if (process_list.Count == index + 1)
-            {
-                return index;
-            }
-            return index + 1;
+            return index;
         }
 
         public async Task<List<ApplyProcess>> GetApplyLogByOrderSnAsync(EnumOrderType _ot, string order_sn, int _depart, int _start_position)

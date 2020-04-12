@@ -7,6 +7,8 @@ using api.Servers.DepartmentServer.Impl;
 using api.Servers.DepartmentServer.Interface;
 using api.Servers.FactoryServer.Impl;
 using api.Servers.FactoryServer.Interface;
+using api.Servers.PositionServer.Impl;
+using api.Servers.PositionServer.Interface;
 using api.Servers.ProductServer.Impl;
 using api.Servers.ProductServer.Interface;
 using api.Servers.StockServer.Interface;
@@ -722,7 +724,7 @@ namespace api.Servers.StockServer.Impl
                 s.apply_status,
                 s.department_id,
                 s.position_id
-            }, reqmodel.Data.order_sn, reqmodel.Data.page_index, reqmodel.Data.page_size);
+            }, reqmodel.Data.order_sn, reqmodel.User.position_id, reqmodel.Data.page_index, reqmodel.Data.page_size);
 
             Result<PaginerData<List<SearchStockInResult>>> result = new Result<PaginerData<List<SearchStockInResult>>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
             PaginerData<List<SearchStockInResult>> result_paginer = new PaginerData<List<SearchStockInResult>> { page_index = order_list.page_index, page_size = order_list.page_size, page_total = order_list.page_total, total = order_list.total, Data = new List<SearchStockInResult>() };
@@ -744,6 +746,7 @@ namespace api.Servers.StockServer.Impl
                     depart_name = depart_model.department_name,
                     audit_list = await auditServer.GetApplyLogByOrderSnAsync(EnumOrderType.IN, item.order_sn, item.department_id, item.position_id),
                     audit_step_index = auditServer.GetApplyIndex(EnumOrderType.IN, item.department_id, item.position_id, item.apply_process),//获取审批到第几步
+                    op_audit = (auditServer.GetNextApplyer(EnumOrderType.IN, item.department_id, item.apply_process) == reqmodel.User.position_id) && item.apply_status == (int)EnumApplyStatus.Progress
                 });
             }
             result.data = result_paginer;
@@ -755,10 +758,11 @@ namespace api.Servers.StockServer.Impl
         /// </summary>
         /// <param name="selector">列选择器</param>
         /// <param name="order_sn">订单号</param>
+        /// <param name="position_id">职位id</param>
         /// <param name="page_index">页码</param>
         /// <param name="page_size">数量</param>
         /// <returns></returns>
-        public async Task<PaginerData<List<t_stock_in>>> GetStockHasByVagueOrderSn(Func<t_stock_in, dynamic> selector, string order_sn, int page_index, int page_size = 15)
+        public async Task<PaginerData<List<t_stock_in>>> GetStockHasByVagueOrderSn(Func<t_stock_in, dynamic> selector, string order_sn, int position_id, int page_index, int page_size = 15)
         {
             ISelect<t_stock_in> select = g_sqlMaker.Select(selector);
             ISelect<t_stock_in> select_count = g_sqlMaker.Select<t_stock_in>(null);
@@ -775,6 +779,7 @@ namespace api.Servers.StockServer.Impl
                 where_count = select_count.Count().Where();
             }
             string sql_data = where_data
+                                   .And("position_id", "in", "@position_ids")
                                    .And("status", "=", "@status")
                                    .OrderByDesc("add_time")
                                    .Pager(page_index, page_size)
@@ -784,9 +789,12 @@ namespace api.Servers.StockServer.Impl
                                    .And("status", "=", "@status")
                                    .ToSQL();
 
+            IPositionServer positionServer = new PositionServerImpl(g_dbHelper, g_logServer);
+            List<int> position_ids = (await positionServer.GetSubordinatePositions(s => new { s.id }, position_id)).Select(s => s.id).ToList();
+            position_ids.Insert(0, position_id);
             PaginerData<List<t_stock_in>> paginer_data = new PaginerData<List<t_stock_in>>
             {
-                Data = await g_dbHelper.QueryListAsync<t_stock_in>(sql_data, new { order_sn = $"%{order_sn}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal }),
+                Data = await g_dbHelper.QueryListAsync<t_stock_in>(sql_data, new { order_sn = $"%{order_sn}%", position_ids = position_ids, status = (int)EnumStatus.Enable, state = (int)EnumState.Normal }),
                 page_index = page_index,
                 page_size = page_size,
                 total = await g_dbHelper.QueryAsync<int>(sql_count, new { order_sn = $"%{order_sn}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal })

@@ -32,5 +32,13 @@ namespace api.Servers.PositionServer.Interface
         /// <param name="id"></param>
         /// <returns></returns>
         Task<t_position> GetPosition(Func<t_position, dynamic> selector, int id);
+
+        /// <summary>
+        /// @xis 获取下属职位列表
+        /// </summary>
+        /// <param name="selector">列选择器</param>
+        /// <param name="position">当前职位</param>
+        /// <returns></returns>
+        Task<IEnumerable<t_position>> GetSubordinatePositions(Func<t_position, dynamic> selector, int position);
     }
 }
