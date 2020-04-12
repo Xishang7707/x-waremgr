@@ -134,7 +134,7 @@ namespace api.Servers.AuditServer.Impl
             int index = process_list.IndexOf(_cur_audited_position);
             if (index == -1)
             {
-                return -1;
+                return 0;
             }
 
             if (process_list.Count == index + 1)

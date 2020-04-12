@@ -49,5 +49,23 @@ namespace api.Controllers
                 data = Common.AESEncrypt(model.str, model.guid)
             };
         }
+        
+        /// <summary>
+        /// 数据库解密
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        [HttpGet("sqldesc")]
+        [AllowAnonymous]
+        public IActionResult SQLDesc([FromQuery]SQLModel model)
+        {
+            return new Result<string>
+            {
+                code = ErrorCodeConst.ERROR_200,
+                status = ErrorCodeConst.ERROR_200,
+                data = Common.AESDecrypt(model.str, model.guid)
+            };
+        }
     }
 }
