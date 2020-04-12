@@ -733,7 +733,6 @@ namespace api.Servers.StockServer.Impl
             {
                 t_user user_model = await userServer.GetUserById(s => new { s.real_name, s.job_number }, item.in_user_id);
                 t_department depart_model = await departmentServer.GetDepartment(s => new { s.department_name }, item.department_id);
-                List<ApplyProcess> apply_list = await auditServer.GetApplyLogByOrderSnAsync(EnumOrderType.IN, item.order_sn, item.department_id, item.position_id);
                 result_paginer.Data.Add(new SearchStockInResult
                 {
                     add_time = item.add_time.Value.ToString("yyyy-MM-dd hh:mm:ss"),
@@ -743,8 +742,8 @@ namespace api.Servers.StockServer.Impl
                     job_number = user_model.job_number,
                     order_sn = item.order_sn,
                     depart_name = depart_model.department_name,
-                    audit_list = apply_list,
-                    audit_step_index = apply_list.Count,
+                    audit_list = await auditServer.GetApplyLogByOrderSnAsync(EnumOrderType.IN, item.order_sn, item.department_id, item.position_id),
+                    audit_step_index = auditServer.GetApplyIndex(EnumOrderType.IN, item.department_id, item.position_id, item.apply_process),//获取审批到第几步
                 });
             }
             result.data = result_paginer;

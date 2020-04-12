@@ -59,5 +59,15 @@ namespace api.Servers.AuditServer.Interface
         /// <param name="_start_position">起始职位</param>
         /// <returns></returns>
         IEnumerable<int> GetApplyList(EnumOrderType _ot, int _depart, int _start_position);
+
+        /// <summary>
+        /// @xis 获取当前审批步骤index【0】
+        /// </summary>
+        /// <param name="_ot">订单类型</param>
+        /// <param name="_depart">部门</param>
+        /// <param name="_start_position">申请人职位</param>
+        /// <param name="_cur_audited_position">当前已审批职位</param>
+        /// <returns></returns>
+        int GetApplyIndex(EnumOrderType _ot, int _depart, int _start_position, int _cur_audited_position);
     }
 }

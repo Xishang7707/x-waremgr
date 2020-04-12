@@ -122,6 +122,28 @@ namespace api.Servers.AuditServer.Impl
             return result_list;
         }
 
+        public int GetApplyIndex(EnumOrderType _ot, int _depart, int _start_position, int _cur_audited_position)
+        {
+            JObject process_json = CommonConfig.ProcessConfig[_ot.ToString()] as JObject;
+            if (process_json == null)
+            {
+                return -1;
+            }
+            List<int> process_list = GetApplyList(_ot, _depart, _start_position).ToList();//流程列表
+
+            int index = process_list.IndexOf(_cur_audited_position);
+            if (index == -1)
+            {
+                return -1;
+            }
+
+            if (process_list.Count == index + 1)
+            {
+                return index;
+            }
+            return index + 1;
+        }
+
         public async Task<List<ApplyProcess>> GetApplyLogByOrderSnAsync(EnumOrderType _ot, string order_sn, int _depart, int _start_position)
         {
             string sql = g_sqlMaker.Select<t_apply_log>().Where("order_sn", "=", "@order_sn").ToSQL();
