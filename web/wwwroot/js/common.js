@@ -56,7 +56,7 @@ function post({ url, data, async = true, success, error }) {
  * @param {any} v
  */
 function token(v) {
-    if (v) {
+    if (v || v == '') {
         Cookies.set('x-access-s', v);
     }
     return Cookies.get('x-access-s');
@@ -81,4 +81,23 @@ function get_top_window() {
     while (p != p.window.parent) {
         p = p.window.parent;
     } return p;
+}
+
+var _cache_data = {};
+
+/**
+ * 登出
+ * */
+function login_out_tologin() {
+    var w = get_top_window();
+    post({
+        url: api_host + 'user/loginout',
+        success: o => {
+            w.location.href = 'login';
+        },
+        e: o => {
+            w.location.href = 'login';
+        }
+    });
+    token('');
 }

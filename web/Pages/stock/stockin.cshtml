@@ -1,0 +1,20 @@
+﻿@page
+@model web.stockinModel
+@{
+    ViewData["Title"] = "入库";
+}
+<link href="~/css/steps.css" rel="stylesheet" />
+<script src="~/js/steps.min.js"></script>
+<script src="~/js/stockin.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-btn-group">
+                <button type="button" class="layui-btn" id="open_stockin_apply">入库申请</button>
+                <button type="button" class="layui-btn">入库审批</button>
+            </div>
+        </div>
+        <div class="layui-card-body" id="stockin-body">
+        </div>
+    </div>
+</body>
