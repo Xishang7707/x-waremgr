@@ -1,0 +1,150 @@
+﻿@page
+@model web.Pages.stock.stockin_detailModel
+@{
+    ViewData["Title"] = "入库详情";
+}
+<script src="~/js/stockin-detail.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-row">
+                <div class="layui-col-xs3">
+                    所属部门： <span id="u_depart_name"></span>
+                </div>
+                @*<div class="layui-col-xs3">
+                        工号： <span id="u_jobcardid"></span>
+                    </div>*@
+                <div class="layui-col-xs3">
+                    申请人： <span id="u_real_name"></span>
+                </div>
+                <div class="layui-col-xs3">
+                    订单号： <span id="o_order_sn"></span>
+                </div>
+                <div class="layui-col-xs3">
+                    审批状态： <span id="o_apply_status"></span>
+                </div>
+                <div class="layui-col-xs3">
+                    申请时间： <span id="o_apply_time"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <div id="stockin-apply-log">
+
+            </div>
+            <div id="stockin-apply-body">
+                <div class="stockin-apply-product-item" data-item-key=${t}>
+                    <fieldset class="layui-elem-field">
+                        <form class="layui-form" action="">
+                            <div class="layui-field-box">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">产品名称</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="hidden" name='product_id' class="product_id">
+                                            <input type="text" name="product_name" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">供货商</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="hidden" name='factory_id' class="factory_id" id='factory_id-${t}'>
+                                            <select id='factory_name-${t}' name="factory_name" lay-verify="" lay-filter='factory_name-${t}' lay-search>
+                                                ${factory_select_item}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">物资编号</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="material_number" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">批号</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="batch_number" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">型号</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="model_number" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">规格</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="package_size" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">数量</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="quantity" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">报告单</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="report_card_url" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">有效期</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="expiration_date" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">复验期</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="retest_date" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">使用说明</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="instructions" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">配件</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="spare_parts" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">单价</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="unit_price" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label">单位</label>
+                                        <div class="layui-input-inline" style="width: 225px;">
+                                            <input type="text" name="unit_name" autocomplete="off" class="layui-input" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <div class="layui-btn-container">
+                                            <button type="button" class="layui-btn layui-bg-red btn-rm-product">移除产品</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div style="text-align: center;">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" id="btn-stockin-apply">提交入库申请</button>
+                    <button type="button" class="layui-btn" id="btn-add-product">添加产品</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

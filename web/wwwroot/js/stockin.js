@@ -98,7 +98,7 @@ function stock_item_temp(o) {
                     <td>${o['add_time']}</td>
                     <td>
                         <div class="layui-btn-container">
-                            <button type="button" class="layui-btn layui-btn-sm layui-btn-fluid">详情</button>
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-fluid" onclick="open_stockin_detail('${o['order_sn']}')">详情</button>
                             ${o['op_audit'] == true ? op_audit_temp : ''}
                         </div>
                     </td>
@@ -138,6 +138,20 @@ function open_stockin_apply() {
         w.open('stockin_apply', '_blank');
     }
 }
+
+/**
+ * 打开入库详情
+ * */
+function open_stockin_detail(order_sn) {
+    var w = get_top_window();
+    if (w.open_tab) {
+        w.open_tab('入库详情' + order_sn, 'stock/stockin_detail?order_sn=' + order_sn, 'stockin_detail_' + order_sn);
+    } else {
+        w.open('stockin_detail?order_sn=' + order_sn, '_blank');
+    }
+}
+
+
 
 /**
  * 同意申请
