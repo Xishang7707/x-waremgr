@@ -835,9 +835,11 @@ namespace api.Servers.StockServer.Impl
             t_department depart_model = await departmentServer.GetDepartment(s => new { s.department_name }, stock_in_model.department_id);
             result.data = new StockInDetailResult
             {
-                add_time = stock_in_model.add_time.Value.ToString("yyyy-MM-dd hh:mm:ss"),
+                add_time = stock_in_model.add_time.Value.ToString("yyyy-MM-dd hh:mm:ss") ?? "",
                 applyer = user_model.real_name,
                 apply_status = stock_in_model.apply_status,
+                apply_status_desc = ((EnumApplyStatus)stock_in_model.apply_status).GetDesc(),
+                audit_step_index = auditServer.GetApplyIndex(EnumOrderType.IN, stock_in_model.department_id, stock_in_model.position_id, stock_in_model.apply_process),
                 job_number = user_model.job_number,
                 order_sn = stock_in_model.order_sn,
                 depart_name = depart_model.department_name,

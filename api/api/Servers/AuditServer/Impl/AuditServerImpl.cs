@@ -155,7 +155,7 @@ namespace api.Servers.AuditServer.Impl
                     {
                         audit_status = apply_log_model.apply_status,
                         audit_status_desc = ((EnumAuditStatus)apply_log_model.apply_status).GetDesc(),
-                        audit_time = apply_log_model.add_time.Value.ToString("yyyy-MM-dd hh:mm"),
+                        audit_time = apply_log_model.add_time.Value.ToString("yyyy-MM-dd hh:mm") ?? "",
                         remark = apply_log_model.remark,
                         position_name = position_model.position_name,
                         auditer = user_model.real_name,
