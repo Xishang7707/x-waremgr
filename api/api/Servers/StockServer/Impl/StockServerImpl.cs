@@ -214,6 +214,7 @@ namespace api.Servers.StockServer.Impl
             result.code = ErrorCodeConst.ERROR_1036;
             result.status = ErrorCodeConst.ERROR_200;
             g_logServer.Log(modelname, "入库单申请成功", $"用户：{reqmodel.User.user_name},订单号：{stock_in.order_sn}", models.enums.EnumLogType.Info);
+            g_dbHelper.Dispose();
             return result;
         }
 
@@ -347,6 +348,7 @@ namespace api.Servers.StockServer.Impl
             result.code = ErrorCodeConst.ERROR_1029;
             result.status = ErrorCodeConst.ERROR_200;
             g_logServer.Log(modelname, "入库审批成功", $"用户：{reqmodel.User.user_name},订单号：{stock_in.order_sn}", models.enums.EnumLogType.Info);
+            g_dbHelper.Dispose();
             return result;
         }
 
@@ -655,6 +657,7 @@ namespace api.Servers.StockServer.Impl
             List<t_stock> stock_list = await GetStockHasByVagueName(s => new { s.id, s.product_name, s.quantity }, reqmodel.Data.name, reqmodel.Data.count);
             IEnumerable<SearchStockResult> result_list = stock_list.GroupBy(g => g.product_name).Select(s => new SearchStockResult { name = s.Key, quantity = stock_list.Where(w => w.product_name == s.Key).Sum(sm => sm.quantity) });
             result.data = result_list;
+            g_dbHelper.Dispose();
             return result;
         }
 
@@ -750,6 +753,7 @@ namespace api.Servers.StockServer.Impl
                 });
             }
             result.data = result_paginer;
+            g_dbHelper.Dispose();
             return result;
         }
 
@@ -872,7 +876,7 @@ namespace api.Servers.StockServer.Impl
                     factory_name = (await factoryServer.GetFactoryById(f => new { f.factory_name }, item.factory_id)).factory_name
                 });
             }
-
+            g_dbHelper.Dispose();
             result.code = ErrorCodeConst.ERROR_200;
             result.status = ErrorCodeConst.ERROR_200;
             return result;

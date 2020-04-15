@@ -151,8 +151,6 @@ function open_stockin_detail(order_sn) {
     }
 }
 
-
-
 /**
  * 同意申请
  * @param {any} e 元素
