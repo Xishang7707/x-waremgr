@@ -843,7 +843,7 @@ namespace api.Servers.StockServer.Impl
                 job_number = user_model.job_number,
                 order_sn = stock_in_model.order_sn,
                 depart_name = depart_model.department_name,
-                audit_list = await auditServer.GetApplyLogByOrderSnAsync(EnumOrderType.IN, stock_in_model.order_sn, stock_in_model.department_id, stock_in_model.position_id),
+                audit_list = await auditServer.GetApplyedLogByOrderSnAsync(EnumOrderType.IN, stock_in_model.order_sn, stock_in_model.department_id, stock_in_model.position_id),
                 products = new List<StockInProductResult>()
             };
 

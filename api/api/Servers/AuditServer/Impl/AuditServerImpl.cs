@@ -172,5 +172,31 @@ namespace api.Servers.AuditServer.Impl
 
             return apply_list;
         }
+
+        public async Task<List<ApplyProcess>> GetApplyedLogByOrderSnAsync(EnumOrderType _ot, string order_sn, int _depart, int _start_position)
+        {
+            string sql = g_sqlMaker.Select<t_apply_log>().Where("order_sn", "=", "@order_sn").OrderByAsc("add_time").ToSQL();
+            List<t_apply_log> apply_log_list = await g_dbHelper.QueryListAsync<t_apply_log>(sql, new { order_sn });
+            IPositionServer positionServer = new PositionServerImpl(g_dbHelper, g_logServer);
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
+            List<ApplyProcess> apply_list = new List<ApplyProcess>();
+
+            foreach (var item in apply_log_list)
+            {
+                t_position position_model = await positionServer.GetPosition(s => new { s.position_name }, item.position_id);
+                t_user user_model = await userServer.GetUserById(s => new { s.real_name }, item.user_id);
+                apply_list.Add(new ApplyProcess
+                {
+                    audit_status = item.apply_status,
+                    audit_status_desc = ((EnumAuditStatus)item.apply_status).GetDesc(),
+                    audit_time = item.add_time.Value.ToString("yyyy-MM-dd hh:mm") ?? "",
+                    remark = item.remark,
+                    position_name = position_model.position_name,
+                    auditer = user_model.real_name,
+                });
+            }
+
+            return apply_list;
+        }
     }
 }

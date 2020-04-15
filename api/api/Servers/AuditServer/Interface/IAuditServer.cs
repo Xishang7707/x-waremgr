@@ -29,6 +29,16 @@ namespace api.Servers.AuditServer.Interface
         /// <param name="_start_position">职位id</param>
         /// <returns></returns>
         Task<List<ApplyProcess>> GetApplyLogByOrderSnAsync(EnumOrderType _ot, string order_sn, int _depart, int _start_position);
+        
+        /// <summary>
+        /// 获取订单已审批的审批记录
+        /// </summary>
+        /// <param name="_ot">订单类型</param>
+        /// <param name="order_sn">订单号</param>
+        /// <param name="_depart">部门id</param>
+        /// <param name="_start_position">职位id</param>
+        /// <returns></returns>
+        Task<List<ApplyProcess>> GetApplyedLogByOrderSnAsync(EnumOrderType _ot, string order_sn, int _depart, int _start_position);
 
         /// <summary>
         /// @xis 获取下一个审批者
