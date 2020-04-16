@@ -7,20 +7,17 @@ using api.Servers.DepartmentServer.Impl;
 using api.Servers.DepartmentServer.Interface;
 using api.Servers.FactoryServer.Impl;
 using api.Servers.FactoryServer.Interface;
+using api.Servers.LogServer.Interface;
 using api.Servers.PositionServer.Impl;
 using api.Servers.PositionServer.Interface;
-using api.Servers.ProductServer.Impl;
-using api.Servers.ProductServer.Interface;
 using api.Servers.StockServer.Interface;
 using api.Servers.UserServer.Impl;
 using api.Servers.UserServer.Interface;
-using common;
 using common.Consts;
+using common.DB.Interface;
 using common.SqlMaker.Interface;
 using models.db_models;
 using models.enums;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +30,8 @@ namespace api.Servers.StockServer.Impl
     /// </summary>
     public class StockServerImpl : BaseServiceImpl, IStockServer
     {
+        public StockServerImpl(IDbHelper dbHelper = null, ILogServer logServer = null) : base(dbHelper, logServer) { }
+
         /// <summary>
         /// 订单号生成
         /// </summary>
@@ -214,7 +213,6 @@ namespace api.Servers.StockServer.Impl
             result.code = ErrorCodeConst.ERROR_1036;
             result.status = ErrorCodeConst.ERROR_200;
             g_logServer.Log(modelname, "入库单申请成功", $"用户：{reqmodel.User.user_name},订单号：{stock_in.order_sn}", models.enums.EnumLogType.Info);
-            g_dbHelper.Dispose();
             return result;
         }
 
@@ -348,7 +346,6 @@ namespace api.Servers.StockServer.Impl
             result.code = ErrorCodeConst.ERROR_1029;
             result.status = ErrorCodeConst.ERROR_200;
             g_logServer.Log(modelname, "入库审批成功", $"用户：{reqmodel.User.user_name},订单号：{stock_in.order_sn}", models.enums.EnumLogType.Info);
-            g_dbHelper.Dispose();
             return result;
         }
 
@@ -657,7 +654,6 @@ namespace api.Servers.StockServer.Impl
             List<t_stock> stock_list = await GetStockHasByVagueName(s => new { s.id, s.product_name, s.quantity }, reqmodel.Data.name, reqmodel.Data.count);
             IEnumerable<SearchStockResult> result_list = stock_list.GroupBy(g => g.product_name).Select(s => new SearchStockResult { name = s.Key, quantity = stock_list.Where(w => w.product_name == s.Key).Sum(sm => sm.quantity) });
             result.data = result_list;
-            g_dbHelper.Dispose();
             return result;
         }
 
@@ -753,7 +749,6 @@ namespace api.Servers.StockServer.Impl
                 });
             }
             result.data = result_paginer;
-            g_dbHelper.Dispose();
             return result;
         }
 
@@ -876,7 +871,6 @@ namespace api.Servers.StockServer.Impl
                     factory_name = (await factoryServer.GetFactoryById(f => new { f.factory_name }, item.factory_id)).factory_name
                 });
             }
-            g_dbHelper.Dispose();
             result.code = ErrorCodeConst.ERROR_200;
             result.status = ErrorCodeConst.ERROR_200;
             return result;

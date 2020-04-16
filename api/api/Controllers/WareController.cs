@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Attributes;
 using api.requests;
+using api.Servers.LogServer.Interface;
 using api.Servers.WareServer.Impl;
 using api.Servers.WareServer.Interface;
+using common.DB.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,6 +17,8 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class WareController : BaseController
     {
+        public WareController(IDbHelper _dbHelper, ILogServer _logServer) : base(_dbHelper, _logServer) { }
+
         /// <summary>
         /// @xis 添加仓库 2020-3-29 11:59:43
         /// </summary>
@@ -31,7 +35,7 @@ namespace api.Controllers
 
             reqmodel<AddWareModel> reqmodel = await RequestPackingAsync(model);
 
-            IWareServer wareServer = new WareServerImpl();
+            IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
             return await wareServer.AddWareAsync(reqmodel);
         }
 
@@ -44,7 +48,7 @@ namespace api.Controllers
         [Privilege("delete_ware")]
         public async Task<IActionResult> DeleteWare([FromBody]int id)
         {
-            IWareServer wareServer = new WareServerImpl();
+            IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
             return await wareServer.DeleteWareAsync(id);
         }
 
@@ -55,7 +59,7 @@ namespace api.Controllers
         [HttpPost("getallwares")]
         public async Task<IActionResult> GetAllWares()
         {
-            IWareServer wareServer = new WareServerImpl();
+            IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
             return await wareServer.GetAllWares();
         }
     }

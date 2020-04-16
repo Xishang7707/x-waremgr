@@ -1,4 +1,9 @@
 using api.Externs;
+using api.Servers.LogServer.Impl;
+using api.Servers.LogServer.Interface;
+using common.Config;
+using common.DB.Impl;
+using common.DB.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,10 +24,9 @@ namespace api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(o =>
-            {
-                //o.Filters.Add<AuthFilter>();
-            });
+            services.AddControllers();
+            services.AddSingleton<ILogServer, LogServerImpl>();
+            services.AddScoped<IDbHelper, DBHelper>(o => new DBHelper(DBConfig.Instance));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

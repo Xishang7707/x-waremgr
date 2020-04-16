@@ -6,8 +6,10 @@ using api.Attributes;
 using api.Externs;
 using api.requests;
 using api.responses;
+using api.Servers.LogServer.Interface;
 using api.Servers.UserServer.Impl;
 using api.Servers.UserServer.Interface;
+using common.DB.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,8 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class UserController : BaseController
     {
+        public UserController(IDbHelper _dbHelper, ILogServer _logServer) : base(_dbHelper, _logServer) { }
+
         /// <summary>
         /// @xis 添加用户 2020-3-24 20:08:57
         /// </summary>
@@ -32,7 +36,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<RegisterModel> reqmodel = await RequestPackingAsync(model);
-            IUserServer userServer = new UserServerImpl();
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
 
             return await userServer.AddUserAsync(reqmodel);
         }
@@ -63,7 +67,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<LoginModel> reqmodel = await RequestPackingAsync(model);
-            IUserServer userServer = new UserServerImpl();
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
 
             return await userServer.LoginAsync(reqmodel);
         }
@@ -76,7 +80,7 @@ namespace api.Controllers
         public async Task<IActionResult> LoginOut()
         {
             reqmodel reqmodel = await RequestPackingAsync();
-            IUserServer userServer = new UserServerImpl();
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
 
             return await userServer.LoginOutAsync(reqmodel);
         }
@@ -89,7 +93,7 @@ namespace api.Controllers
         public async Task<IActionResult> GetUserInfo()
         {
             reqmodel reqmodel = await RequestPackingAsync();
-            IUserServer userServer = new UserServerImpl();
+            IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
 
             return await userServer.GetUserInfoAsync(reqmodel);
         }

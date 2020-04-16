@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using api.requests;
+using api.Servers.LogServer.Interface;
 using api.Servers.StockServer.Impl;
 using api.Servers.StockServer.Interface;
+using common.DB.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -14,6 +16,7 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class StockController : BaseController
     {
+        public StockController(IDbHelper _dbHelper, ILogServer _logServer) : base(_dbHelper, _logServer) { }
         /// <summary>
         /// @xis 入库申请 2020-4-1 22:07:35
         /// </summary>
@@ -26,7 +29,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<StockInApplyModel> reqmodel = await RequestPackingAsync(model);
-            IStockServer stockServer = new StockServerImpl();
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
             return await stockServer.StockInApplyAsync(reqmodel);
         }
 
@@ -42,7 +45,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<AuditModel> reqmodel = await RequestPackingAsync(model);
-            IStockServer stockServer = new StockServerImpl();
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
             return await stockServer.StockInAuditAsync(reqmodel);
         }
 
@@ -59,7 +62,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<SearchStockModel> reqmodel = await RequestPackingAsync(model);
-            IStockServer stockServer = new StockServerImpl();
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
             return await stockServer.SearchStockAsync(reqmodel);
         }
 
@@ -72,7 +75,7 @@ namespace api.Controllers
         public async Task<IActionResult> SearchStockInPaginer([FromQuery]SearchStockInModel model)
         {
             reqmodel<SearchStockInModel> reqmodel = await RequestPackingAsync(model);
-            IStockServer stockServer = new StockServerImpl();
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
             return await stockServer.SearchStockInPaginerAsync(reqmodel);
         }
 
@@ -89,7 +92,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<StockInDetailModel> reqmodel = await RequestPackingAsync(model);
-            IStockServer stockServer = new StockServerImpl();
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
             return await stockServer.GetStockInDetailAsync(reqmodel);
         }
 

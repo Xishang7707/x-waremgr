@@ -6,6 +6,8 @@ using api.Attributes;
 using api.requests;
 using api.Servers.FactoryServer.Impl;
 using api.Servers.FactoryServer.Interface;
+using api.Servers.LogServer.Interface;
+using common.DB.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,6 +17,8 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class FactoryController : BaseController
     {
+        public FactoryController(IDbHelper _dbHelper, ILogServer _logServer) : base(_dbHelper, _logServer) { }
+
         /// <summary>
         /// @xis 添加供应商 2020-3-28 13:03:04
         /// </summary>
@@ -28,7 +32,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<AddFactoryModel> reqmodel = await RequestPackingAsync(model);
-            IFactoryServer factoryServer = new FactoryServerImpl();
+            IFactoryServer factoryServer = new FactoryServerImpl(g_dbHelper, g_logServer);
 
             return await factoryServer.AddFactory(reqmodel);
         }
@@ -42,7 +46,7 @@ namespace api.Controllers
         public async Task<IActionResult> DeleteFactory([FromBody]int id)
         {
             reqmodel<int> reqmodel = await RequestPackingAsync(id);
-            IFactoryServer factoryServer = new FactoryServerImpl();
+            IFactoryServer factoryServer = new FactoryServerImpl(g_dbHelper, g_logServer);
 
             return await factoryServer.DeleteFactory(reqmodel);
         }
@@ -56,7 +60,7 @@ namespace api.Controllers
         public async Task<IActionResult> SearchFactoryDrop([FromQuery]SearchFactoryModel model)
         {
             reqmodel<SearchFactoryModel> reqmodel = await RequestPackingAsync(model);
-            IFactoryServer factoryServer = new FactoryServerImpl();
+            IFactoryServer factoryServer = new FactoryServerImpl(g_dbHelper, g_logServer);
 
             return await factoryServer.SearchFactoryDrop(reqmodel);
         }

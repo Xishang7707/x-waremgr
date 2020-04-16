@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using api.responses;
+using api.Servers.LogServer.Interface;
 using common.Consts;
+using common.DB.Interface;
 using common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +18,8 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class ValuesController : BaseController
     {
+        public ValuesController(IDbHelper _dbHelper, ILogServer _logServer) : base(_dbHelper, _logServer) { }
+
         [HttpGet]
         [AllowAnonymous]
         public ActionResult<IEnumerable<string>> Get()
@@ -49,7 +53,7 @@ namespace api.Controllers
                 data = Common.AESEncrypt(model.str, model.guid)
             };
         }
-        
+
         /// <summary>
         /// 数据库解密
         /// </summary>

@@ -1,14 +1,12 @@
 ﻿using api.requests;
 using api.responses;
+using api.Servers.LogServer.Interface;
 using api.Servers.WareServer.Interface;
-using common;
 using common.Consts;
+using common.DB.Interface;
 using models.db_models;
 using models.enums;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace api.Servers.WareServer.Impl
@@ -18,6 +16,8 @@ namespace api.Servers.WareServer.Impl
     /// </summary>
     public class WareServerImpl : BaseServiceImpl, IWareServer
     {
+        public WareServerImpl(IDbHelper dbHelper = null, ILogServer logServer = null) : base(dbHelper, logServer) { }
+
         public async Task<Result> AddWareAsync(reqmodel<AddWareModel> reqmodel)
         {
             Result result = new Result { code = ErrorCodeConst.ERROR_1030, status = ErrorCodeConst.ERROR_403 };

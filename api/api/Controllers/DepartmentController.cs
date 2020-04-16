@@ -7,8 +7,10 @@ using api.requests;
 using api.responses;
 using api.Servers.DepartmentServer.Impl;
 using api.Servers.DepartmentServer.Interface;
+using api.Servers.LogServer.Interface;
 using api.Servers.UserServer.Impl;
 using api.Servers.UserServer.Interface;
+using common.DB.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,6 +23,8 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class DepartmentController : BaseController
     {
+        public DepartmentController(IDbHelper _dbHelper, ILogServer _logServer) : base(_dbHelper, _logServer) { }
+
         /// <summary>
         /// @xis 添加部门 2020-3-28 12:36:50
         /// </summary>
@@ -34,7 +38,7 @@ namespace api.Controllers
                 return GetModelErrorCode();
             }
             reqmodel<AddDepartmentModel> reqmodel = await RequestPackingAsync(model);
-            IDepartmentServer departmentServer = new DepartmentServerImpl();
+            IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
 
             return await departmentServer.AddDepartment(reqmodel);
         }
@@ -48,7 +52,7 @@ namespace api.Controllers
         public async Task<IActionResult> DeleteDepartment([FromBody]int id)
         {
             reqmodel<int> reqmodel = await RequestPackingAsync(id);
-            IDepartmentServer departmentServer = new DepartmentServerImpl();
+            IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
 
             return await departmentServer.DeleteDepartment(reqmodel);
         }
@@ -60,7 +64,7 @@ namespace api.Controllers
         [HttpGet("getalldepartments")]
         public async Task<IActionResult> GetAllDepartments()
         {
-            IDepartmentServer departmentServer = new DepartmentServerImpl();
+            IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
 
             return await departmentServer.GetAllDepartments();
         }
@@ -72,7 +76,7 @@ namespace api.Controllers
         [HttpGet("getalldepartmentdeps")]
         public async Task<IActionResult> GetAllDepartmentDeps()
         {
-            IDepartmentServer departmentServer = new DepartmentServerImpl();
+            IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
 
             return await departmentServer.GetAllDepartmentDeps();
         }

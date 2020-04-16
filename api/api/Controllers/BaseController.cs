@@ -1,10 +1,15 @@
 ﻿using api.Externs;
 using api.requests;
 using api.responses;
+using api.Servers.LogServer.Impl;
+using api.Servers.LogServer.Interface;
 using common.Config;
 using common.Consts;
+using common.DB.Impl;
+using common.DB.Interface;
 using common.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +17,17 @@ using System.Threading.Tasks;
 
 namespace api.Controllers
 {
-    public class BaseController : ControllerBase
+    public class BaseController : ControllerBase, IActionFilter
     {
+        protected IDbHelper g_dbHelper { get; }//数据库操作
+        protected ILogServer g_logServer { get; }//日志操作
+
+        public BaseController(IDbHelper _dbHelper, ILogServer _logServer)
+        {
+            g_dbHelper = _dbHelper;
+            g_logServer = _logServer;
+        }
+
         private string _lang;
         /// <summary>
         /// @xis 获取语言 2020-2-19 20:27:41
@@ -113,6 +127,16 @@ namespace api.Controllers
             };
 
             return reqmodel;
+        }
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+            
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            g_dbHelper.Dispose();//关闭连接
         }
     }
 }
