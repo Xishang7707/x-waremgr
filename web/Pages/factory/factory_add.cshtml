@@ -1,0 +1,41 @@
+﻿@page
+@model web.Pages.factory.factory_addModel
+@{
+    ViewData["Title"] = "添加供应商";
+}
+<script src="~/js/factory-add.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        <div class="layui-card-header">
+        </div>
+        <div class="layui-card-body">
+            <form class="layui-form" action="" id="factory-add-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">供应商名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="factory_name" autocomplete="off" class="layui-input" maxlength="30">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系人</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="factory_person_name" autocomplete="off" class="layui-input" maxlength="30">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">电话</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="factory_tel" autocomplete="off" class="layui-input" maxlength="30">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div>
+            <div style="text-align: center;">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" id="btn-factory-add">提交入库申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

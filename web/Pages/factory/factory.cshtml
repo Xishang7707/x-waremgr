@@ -1,0 +1,32 @@
+﻿@page
+@model web.Pages.factory.factoryModel
+@{
+    ViewData["Title"] = "供应商管理";
+}
+<script src="~/js/factory.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-btn-group">
+                <button type="button" class="layui-btn" id="open_factory_add">添加供应商</button>
+                @*<button type="button" class="layui-btn">入库审批</button>*@
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="factory_table">
+                <thead>
+                    <tr>
+                        <th>供应商名称</th>
+                        <th>联系方式</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
