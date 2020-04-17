@@ -64,5 +64,19 @@ namespace api.Controllers
 
             return await factoryServer.SearchFactoryDrop(reqmodel);
         }
+
+        /// <summary>
+        /// @xis 搜索供货商 2020-4-17 22:30:57
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("searchfactorybypaginer")]
+        //[Privilege("searchfactorydrop")]
+        public async Task<IActionResult> SearchFactoryByPaginer([FromQuery]SearchFactoryModel model)
+        {
+            reqmodel<SearchFactoryModel> reqmodel = await RequestPackingAsync(model);
+            IFactoryServer factoryServer = new FactoryServerImpl(g_dbHelper, g_logServer);
+
+            return await factoryServer.SearchFactoryByPaginer(reqmodel);
+        }
     }
 }

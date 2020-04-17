@@ -50,5 +50,12 @@ namespace api.Servers.FactoryServer.Interface
         /// <param name="reqmodel"></param>
         /// <returns></returns>
         Task<Result> SearchFactoryDrop(reqmodel<SearchFactoryModel> reqmodel);
+
+        /// <summary>
+        /// @xis 搜索供应商
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        Task<Result> SearchFactoryByPaginer(reqmodel<SearchFactoryModel> reqmodel);
     }
 }

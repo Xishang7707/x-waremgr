@@ -4,6 +4,7 @@ using api.Servers.FactoryServer.Interface;
 using api.Servers.LogServer.Interface;
 using common.Consts;
 using common.DB.Interface;
+using common.SqlMaker.Interface;
 using models.db_models;
 using models.enums;
 using System;
@@ -100,6 +101,58 @@ namespace api.Servers.FactoryServer.Impl
         {
             string sql = g_sqlMaker.Select(selector).Where("factory_name", "like", "@factory_name").And("status", "=", "@status").And("state", "=", "@state").ToSQL();
             return await g_dbHelper.QueryListAsync<t_factory>(sql, new { factory_name = $"%{name}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
+        }
+
+        /// <summary>
+        /// @xis 名称模糊查询供货商
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="name"></param>
+        /// <param name="page_index"></param>
+        /// <param name="page_size"></param>
+        /// <returns></returns>
+        public async Task<PaginerData<List<SearchFactoryResult>>> SearchFactoryByVagueName(string name, int page_index, int page_size = 15)
+        {
+            IWhere<t_factory> where_data = g_sqlMaker.Select<t_factory>(s => new { s.id, s.factory_name, s.factory_person_name, s.factory_tel }).Where();
+            IWhere<t_factory> where_count = g_sqlMaker.Select<t_factory>().Count().Where();
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                where_data.And("name", "like", "@name");
+                where_count.And("name", "like", "@name");
+            }
+
+            where_data.And("status", "=", "@status").And("state", "=", "@state").OrderByDesc("add_time").Pager(page_index, page_size);
+            where_count.And("status", "=", "@status").And("state", "=", "@state");
+            List<t_factory> data_list = await g_dbHelper.QueryListAsync<t_factory>(where_data.ToSQL(), new { factory_name = $"%{name}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
+            int total = await g_dbHelper.QueryAsync<int>(where_count.ToSQL(), new { factory_name = $"%{name}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
+
+            List<SearchFactoryResult> list = new List<SearchFactoryResult>();
+            foreach (var item in data_list)
+            {
+                list.Add(new SearchFactoryResult
+                {
+                    id = item.id,
+                    factory_name = item.factory_name,
+                    factory_person_name = item.factory_person_name,
+                    factory_tel = item.factory_tel
+                });
+            }
+            PaginerData<List<SearchFactoryResult>> paginer_data = new PaginerData<List<SearchFactoryResult>>
+            {
+                Data = list,
+                page_index = page_index,
+                page_size = page_size,
+                total = total
+            };
+            paginer_data.page_total = (paginer_data.total % page_size > 0 ? 1 : 0) + paginer_data.total / page_size;
+            return paginer_data;
+        }
+
+        public async Task<Result> SearchFactoryByPaginer(reqmodel<SearchFactoryModel> reqmodel)
+        {
+            Result<PaginerData<List<SearchFactoryResult>>> result = new Result<PaginerData<List<SearchFactoryResult>>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+            result.data = await SearchFactoryByVagueName(reqmodel.Data.name, reqmodel.Data.page_index, reqmodel.Data.page_size);
+            return result;
         }
 
         public async Task<Result> SearchFactoryDrop(reqmodel<SearchFactoryModel> reqmodel)
