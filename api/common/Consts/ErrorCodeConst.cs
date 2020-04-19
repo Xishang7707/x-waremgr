@@ -345,6 +345,16 @@ namespace common.Consts
         /// </summary>
         public const string ERROR_1057 = "1057";
 
+        /// <summary>
+        /// 仓库名称不能为空
+        /// </summary>
+        public const string ERROR_1058 = "1058";
+
+        /// <summary>
+        /// 仓库位置不能为空
+        /// </summary>
+        public const string ERROR_1059 = "1059";
+
 
         #endregion
     }

@@ -25,7 +25,7 @@ namespace api.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("addware")]
-        [Privilege("add_ware")]
+        //[Privilege("add_ware")]
         public async Task<IActionResult> AddWare([FromBody]AddWareModel model)
         {
             if (!ModelState.IsValid)

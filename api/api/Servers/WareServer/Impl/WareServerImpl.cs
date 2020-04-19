@@ -205,17 +205,17 @@ namespace api.Servers.WareServer.Impl
         public async Task<Result> GetAllWaresDrop()
         {
             List<t_ware> data_list = await GetAllWares(s => new { s.name, s.id });
-            List<KVItemResult<string, int>> result_list = new List<KVItemResult<string, int>>();
+            List<KVItemResult<int, string>> result_list = new List<KVItemResult<int, string>>();
             foreach (var item in data_list)
             {
-                result_list.Add(new KVItemResult<string, int>
+                result_list.Add(new KVItemResult<int, string>
                 {
-                    key = item.name,
-                    value = item.id
+                    key = item.id,
+                    value = item.name
                 });
             }
 
-            Result<IEnumerable<KVItemResult<string, int>>> result = new Result<IEnumerable<KVItemResult<string, int>>>
+            Result<IEnumerable<KVItemResult<int, string>>> result = new Result<IEnumerable<KVItemResult<int, string>>>
             {
                 code = ErrorCodeConst.ERROR_200,
                 status = ErrorCodeConst.ERROR_200,
