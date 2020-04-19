@@ -4,6 +4,7 @@ using api.Servers.LogServer.Interface;
 using api.Servers.WareServer.Interface;
 using common.Consts;
 using common.DB.Interface;
+using common.SqlMaker.Interface;
 using models.db_models;
 using models.enums;
 using Newtonsoft.Json;
@@ -168,8 +169,7 @@ namespace api.Servers.WareServer.Impl
 
         public async Task<Result> GetAllWares()
         {
-            string sql_select = g_sqlMaker.Select<t_ware>().Where("status", "=", "@status").And("state", "=", "@state").ToSQL();
-            List<t_ware> data_list = await g_dbHelper.QueryListAsync<t_ware>(sql_select, new { status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
+            List<t_ware> data_list = await GetAllWares(s => new t_ware());
             List<WareResult> result_list = new List<WareResult>();
             foreach (var item in data_list)
             {
@@ -185,5 +185,43 @@ namespace api.Servers.WareServer.Impl
             return result;
         }
 
+        /// <summary>
+        /// @lx 获取所有仓库信息
+        /// </summary>
+        /// <param name="selector">选择器</param>
+        /// <param name="normal"></param>
+        /// <returns></returns>
+        public async Task<List<t_ware>> GetAllWares(Func<t_ware, dynamic> selector, bool normal = true)
+        {
+            IWhere<t_ware> sql_select = g_sqlMaker.Select(selector).Where();
+            if (normal)
+            {
+                sql_select = sql_select.And("status", "=", "@status").And("state", "=", "@state");
+            }
+            List<t_ware> data_list = await g_dbHelper.QueryListAsync<t_ware>(sql_select.ToSQL(), new { status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });
+            return data_list;
+        }
+
+        public async Task<Result> GetAllWaresDrop()
+        {
+            List<t_ware> data_list = await GetAllWares(s => new { s.name, s.id });
+            List<KVItemResult<string, int>> result_list = new List<KVItemResult<string, int>>();
+            foreach (var item in data_list)
+            {
+                result_list.Add(new KVItemResult<string, int>
+                {
+                    key = item.name,
+                    value = item.id
+                });
+            }
+
+            Result<IEnumerable<KVItemResult<string, int>>> result = new Result<IEnumerable<KVItemResult<string, int>>>
+            {
+                code = ErrorCodeConst.ERROR_200,
+                status = ErrorCodeConst.ERROR_200,
+                data = result_list
+            };
+            return result;
+        }
     }
 }

@@ -33,6 +33,12 @@ namespace api.Servers.WareServer.Interface
         Task<Result> GetAllWares();
 
         /// <summary>
+        /// @xis 获取所有仓库 --下拉
+        /// </summary>
+        /// <returns></returns>
+        Task<Result> GetAllWaresDrop();
+
+        /// <summary>
         /// @xis 放置货物
         /// </summary>
         /// <param name="reqmodel"></param>

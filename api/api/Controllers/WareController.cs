@@ -56,11 +56,22 @@ namespace api.Controllers
         /// @xis 获取所有仓库 2020-3-29 11:59:43
         /// </summary>
         /// <returns></returns>
-        [HttpPost("getallwares")]
+        [HttpGet("getallwares")]
         public async Task<IActionResult> GetAllWares()
         {
             IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
             return await wareServer.GetAllWares();
+        }
+
+        /// <summary>
+        /// @xis 获取所有仓库 --下拉 2020-4-19 16:33:53
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getallwaresdrop")]
+        public async Task<IActionResult> GetAllWaresDrop()
+        {
+            IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
+            return await wareServer.GetAllWaresDrop();
         }
 
         /// <summary>
