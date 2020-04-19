@@ -741,7 +741,7 @@ namespace api.Servers.StockServer.Impl
         /// <returns></returns>
         public async Task<Result> SearchStockInPaginerAsync(reqmodel<SearchStockInModel> reqmodel)
         {
-            PaginerData<List<t_stock_in>> order_list = await GetStockHasByVagueOrderSn(s => new
+            PaginerData<t_stock_in> order_list = await GetStockHasByVagueOrderSn(s => new
             {
                 s.in_user_id,
                 s.order_sn,
@@ -752,8 +752,8 @@ namespace api.Servers.StockServer.Impl
                 s.position_id
             }, reqmodel.Data.order_sn, reqmodel.User.position_id, reqmodel.Data.page_index, reqmodel.Data.page_size);
 
-            Result<PaginerData<List<SearchStockInResult>>> result = new Result<PaginerData<List<SearchStockInResult>>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
-            PaginerData<List<SearchStockInResult>> result_paginer = new PaginerData<List<SearchStockInResult>> { page_index = order_list.page_index, page_size = order_list.page_size, page_total = order_list.page_total, total = order_list.total, Data = new List<SearchStockInResult>() };
+            Result<PaginerData<SearchStockInResult>> result = new Result<PaginerData<SearchStockInResult>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+            PaginerData<SearchStockInResult> result_paginer = new PaginerData<SearchStockInResult> { page_index = order_list.page_index, page_size = order_list.page_size, total = order_list.total, Data = new List<SearchStockInResult>() };
             IAuditServer auditServer = new AuditServerImpl(g_dbHelper, g_logServer);
             IUserServer userServer = new UserServerImpl(g_dbHelper, g_logServer);
             IDepartmentServer departmentServer = new DepartmentServerImpl(g_dbHelper, g_logServer);
@@ -788,7 +788,7 @@ namespace api.Servers.StockServer.Impl
         /// <param name="page_index">页码</param>
         /// <param name="page_size">数量</param>
         /// <returns></returns>
-        public async Task<PaginerData<List<t_stock_in>>> GetStockHasByVagueOrderSn(Func<t_stock_in, dynamic> selector, string order_sn, int position_id, int page_index, int page_size = 15)
+        public async Task<PaginerData<t_stock_in>> GetStockHasByVagueOrderSn(Func<t_stock_in, dynamic> selector, string order_sn, int position_id, int page_index, int page_size = 15)
         {
             ISelect<t_stock_in> select = g_sqlMaker.Select(selector);
             ISelect<t_stock_in> select_count = g_sqlMaker.Select<t_stock_in>(null);
@@ -818,14 +818,13 @@ namespace api.Servers.StockServer.Impl
             IPositionServer positionServer = new PositionServerImpl(g_dbHelper, g_logServer);
             List<int> position_ids = (await positionServer.GetSubordinatePositions(s => new { s.id }, position_id)).Select(s => s.id).ToList();
             position_ids.Insert(0, position_id);
-            PaginerData<List<t_stock_in>> paginer_data = new PaginerData<List<t_stock_in>>
+            PaginerData<t_stock_in> paginer_data = new PaginerData<t_stock_in>
             {
                 Data = await g_dbHelper.QueryListAsync<t_stock_in>(sql_data, new { order_sn = $"%{order_sn}%", position_ids = position_ids, status = (int)EnumStatus.Enable, state = (int)EnumState.Normal }),
                 page_index = page_index,
                 page_size = page_size,
                 total = await g_dbHelper.QueryAsync<int>(sql_count, new { order_sn = $"%{order_sn}%", status = (int)EnumStatus.Enable, state = (int)EnumState.Normal })
             };
-            paginer_data.page_total = (paginer_data.total % page_size > 0 ? 1 : 0) + paginer_data.total / page_size;
             return paginer_data;
         }
 
@@ -900,6 +899,60 @@ namespace api.Servers.StockServer.Impl
             }
             result.code = ErrorCodeConst.ERROR_200;
             result.status = ErrorCodeConst.ERROR_200;
+            return result;
+        }
+
+        /// <summary>
+        /// @xis 待入库列表
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        public async Task<Result> SearchStockPaginerAsync(reqmodel<SearchStockPreModel> reqmodel)
+        {
+            Result<PaginerData<SearchStockPrePaginerResult>> result = new Result<PaginerData<SearchStockPrePaginerResult>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+
+            IWhere<t_stock> stock_data_mkr = g_sqlMaker.Select<t_stock>(s => new { s.id, s.product_name }).Where();
+            IWhere<t_stockin_pre> stock_pre_data_mkr = g_sqlMaker.Select<t_stockin_pre>(s => new { s.id, s.stock_id, s.quantity }).Where();
+            IWhere<t_stockin_pre> stock_pre_total_mkr = g_sqlMaker.Select<t_stockin_pre>().Count().Where();
+            //模糊查询产品
+            List<t_stock> stock_list = new List<t_stock>();
+            if (!string.IsNullOrWhiteSpace(reqmodel.Data.name))
+            {
+                stock_data_mkr = stock_data_mkr.And("product_name", "like", "@product_name");
+                stock_pre_data_mkr = stock_pre_data_mkr.And("stock_id", "in", "@stock_id");
+                stock_pre_total_mkr = stock_pre_total_mkr.And("stock_id", "in", "@stock_id");
+
+                stock_list = await g_dbHelper.QueryListAsync<t_stock>(stock_data_mkr.ToSQL(), new { product_name = $"%{reqmodel.Data.name}%" });
+            }
+
+            //查询待入库
+            string stock_pre_data_sql = stock_pre_data_mkr.OrderByDesc("add_time").Pager(reqmodel.Data.page_index, reqmodel.Data.page_size).ToSQL();
+            List<t_stockin_pre> stock_pre_list = await g_dbHelper.QueryListAsync<t_stockin_pre>(stock_pre_data_sql, new { stock_id = stock_list.Select(s => s.id) });
+            int total = await g_dbHelper.QueryAsync<int>(stock_pre_total_mkr.ToSQL(), new { stock_id = stock_list.Select(s => s.id) });
+            if (string.IsNullOrWhiteSpace(reqmodel.Data.name) && stock_pre_list.Count > 0)
+            {
+                stock_list = await g_dbHelper.QueryListAsync<t_stock>(stock_data_mkr.And("id", "in", "@stock_id").ToSQL(), new { stock_id = stock_pre_list.Select(s => s.stock_id) });
+            }
+            List<SearchStockPrePaginerResult> search_list = new List<SearchStockPrePaginerResult>();
+            foreach (var item in stock_pre_list)
+            {
+                t_stock stock = stock_list.First(f => f.id == item.stock_id);
+                search_list.Add(new SearchStockPrePaginerResult
+                {
+                    id = item.id,
+                    stock_id = item.stock_id,
+                    quantity = item.quantity,
+                    product_name = stock.product_name,
+                });
+            }
+            PaginerData<SearchStockPrePaginerResult> paginer = new PaginerData<SearchStockPrePaginerResult>
+            {
+                page_index = reqmodel.Data.page_index,
+                page_size = reqmodel.Data.page_size,
+                Data = search_list,
+                total = total
+            };
+            result.data = paginer;
             return result;
         }
     }

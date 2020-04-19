@@ -23,4 +23,15 @@ namespace api.requests
         /// </summary>
         public int count { get; set; } = 7;
     }
+
+    /// <summary>
+    /// 待入库库列表
+    /// </summary>
+    public class SearchStockPreModel : PaginerModel
+    {
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string name { get; set; }
+    }
 }

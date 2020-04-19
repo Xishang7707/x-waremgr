@@ -96,5 +96,17 @@ namespace api.Controllers
             return await stockServer.GetStockInDetailAsync(reqmodel);
         }
 
+        /// <summary>
+        /// @xis 待入库列表
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet("searchstockprepaginer")]
+        public async Task<IActionResult> SearchStockPrePaginer([FromQuery]SearchStockPreModel model)
+        {
+            reqmodel<SearchStockPreModel> reqmodel = await RequestPackingAsync(model);
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
+            return await stockServer.SearchStockPaginerAsync(reqmodel);
+        }
     }
 }

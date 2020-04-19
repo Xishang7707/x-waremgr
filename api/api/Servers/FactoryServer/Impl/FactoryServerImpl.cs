@@ -111,7 +111,7 @@ namespace api.Servers.FactoryServer.Impl
         /// <param name="page_index"></param>
         /// <param name="page_size"></param>
         /// <returns></returns>
-        public async Task<PaginerData<List<SearchFactoryResult>>> SearchFactoryByVagueName(string name, int page_index, int page_size = 15)
+        public async Task<PaginerData<SearchFactoryResult>> SearchFactoryByVagueName(string name, int page_index, int page_size = 15)
         {
             IWhere<t_factory> where_data = g_sqlMaker.Select<t_factory>(s => new { s.id, s.factory_name, s.factory_person_name, s.factory_tel }).Where();
             IWhere<t_factory> where_count = g_sqlMaker.Select<t_factory>().Count().Where();
@@ -137,20 +137,19 @@ namespace api.Servers.FactoryServer.Impl
                     factory_tel = item.factory_tel
                 });
             }
-            PaginerData<List<SearchFactoryResult>> paginer_data = new PaginerData<List<SearchFactoryResult>>
+            PaginerData<SearchFactoryResult> paginer_data = new PaginerData<SearchFactoryResult>
             {
                 Data = list,
                 page_index = page_index,
                 page_size = page_size,
                 total = total
             };
-            paginer_data.page_total = (paginer_data.total % page_size > 0 ? 1 : 0) + paginer_data.total / page_size;
             return paginer_data;
         }
 
         public async Task<Result> SearchFactoryByPaginer(reqmodel<SearchFactoryModel> reqmodel)
         {
-            Result<PaginerData<List<SearchFactoryResult>>> result = new Result<PaginerData<List<SearchFactoryResult>>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+            Result<PaginerData<SearchFactoryResult>> result = new Result<PaginerData<SearchFactoryResult>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
             result.data = await SearchFactoryByVagueName(reqmodel.Data.name, reqmodel.Data.page_index, reqmodel.Data.page_size);
             return result;
         }

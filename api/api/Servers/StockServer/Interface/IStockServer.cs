@@ -47,5 +47,12 @@ namespace api.Servers.StockServer.Interface
         /// <param name="reqmodel"></param>
         /// <returns></returns>
         Task<Result> GetStockInDetailAsync(reqmodel<StockInDetailModel> reqmodel);
+
+        /// <summary>
+        /// @xis 待入库列表
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        Task<Result> SearchStockPaginerAsync(reqmodel<SearchStockPreModel> reqmodel);
     }
 }
