@@ -458,8 +458,21 @@ namespace api.Servers.StockServer.Impl
         public async Task<bool> UpdateStock(Func<t_stock, dynamic> update, IEnumerable<t_stock> data)
         {
             //更新库存
-            string sql_update_stock_quelity_list = g_sqlMaker.Update(update).Where("id", "=", "@id").And("rv", "=", "@rv").ToSQL();
-            return await g_dbHelper.ExecAsync(sql_update_stock_quelity_list, data) == data.Count();
+            string sql_update_stock_quantity_list = g_sqlMaker.Update(update).Where("id", "=", "@id").And("rv", "=", "@rv").ToSQL();
+            return await g_dbHelper.ExecAsync(sql_update_stock_quantity_list, data) == data.Count();
+        }
+
+        /// <summary>
+        /// @xis 增加待入库货物
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public async Task<bool> AddStockPre(Func<t_stockin_pre, dynamic> selector, IEnumerable<t_stockin_pre> data)
+        {
+            //增加待入库
+            string sql_insert_stockin_pre_list = g_sqlMaker.Insert(selector).ToSQL();
+            return await g_dbHelper.ExecAsync(sql_insert_stockin_pre_list, data) == data.Count();
         }
 
         /// <summary>
@@ -629,6 +642,7 @@ namespace api.Servers.StockServer.Impl
         {
             List<t_stock_in_detail> detail_list = await GetStockInDetailsByOrderSn(s => new { s.stock_id, s.quantity }, order_sn);
             List<t_stock> stock_list = await GetStockByIds(s => new { s.id, s.quantity, s.rv }, detail_list.Select(s => s.stock_id));
+            List<t_stockin_pre> pre_list = new List<t_stockin_pre>();//待入库
             foreach (var item in stock_list)
             {
                 t_stock_in_detail detail = detail_list.FirstOrDefault(f => f.stock_id == item.id);
@@ -638,9 +652,22 @@ namespace api.Servers.StockServer.Impl
                 }
 
                 item.quantity += detail.quantity;
-            }
 
-            return await UpdateStock(u => new { u.quantity }, stock_list);
+                pre_list.Add(new t_stockin_pre
+                {
+                    stock_id = detail.stock_id,
+                    quantity = detail.quantity
+                });
+            }
+            //更新库存数量
+            bool stock_flag = await UpdateStock(u => new { u.quantity }, stock_list);
+            if (!stock_flag)
+            {
+                return false;
+            }
+            //货物待入库
+            bool pre_flag = await AddStockPre(a => new { a.stock_id, a.quantity }, pre_list);
+            return pre_flag;
         }
 
         /// <summary>
