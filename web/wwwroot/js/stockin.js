@@ -145,7 +145,7 @@ function open_stockin_apply() {
 function open_stockin_detail(order_sn) {
     var w = get_top_window();
     if (w.open_tab) {
-        w.open_tab('入库详情' + order_sn, 'stock/stockin_detail?order_sn=' + order_sn, 'stockin_detail_' + order_sn);
+        w.open_tab('入库单' + order_sn, 'stock/stockin_detail?order_sn=' + order_sn, 'stockin_detail_' + order_sn);
     } else {
         w.open('stockin_detail?order_sn=' + order_sn, '_blank');
     }

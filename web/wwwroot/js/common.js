@@ -1,4 +1,4 @@
-﻿var api_host = 'http://8.129.167.212:7001/api/'
+﻿var api_host = 'http://127.0.0.1:7001/api/';//'http://8.129.167.212:7001/api/'
 
 /**
  * GET请求

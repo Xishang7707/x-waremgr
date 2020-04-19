@@ -1,0 +1,34 @@
+﻿@page
+@model web.Pages.stock.stockin_preModel
+@{
+    ViewData["Title"] = "安置产品";
+}
+<script src="~/js/stockin-pre.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        @*<div class="layui-card-header">
+                <div class="layui-btn-group">
+                    <button type="button" class="layui-btn" id="open_stockin_apply">入库申请</button>
+                    <button type="button" class="layui-btn">入库审批</button>
+                </div>
+            </div>*@
+        <div class="layui-card-body" id="stockin-pre-body">
+            <table class="layui-table">
+                <colgroup>
+                    <col>
+                    <col>
+                    <col width="150">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>产品名称</th>
+                        <th style='text-align:center'>待入库数量</th>
+                        <th style='text-align:center'>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="stockin-pre-stocks">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,41 @@
+﻿@page
+@model web.Pages.ware.ware_addModel
+@{
+    ViewData["Title"] = "添加仓库";
+}
+<script src="~/js/ware-add.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        @*<div class="layui-card-header">
+        </div>*@
+        <div class="layui-card-body">
+            <form class="layui-form" action="" id="ware-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">仓库名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="ware_name" autocomplete="off" class="layui-input" maxlength="30">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">仓库位置</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="location" autocomplete="off" class="layui-input" maxlength="100">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="remark" autocomplete="off" class="layui-input" maxlength="100">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div>
+            <div style="text-align: center;">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" id="btn-ware-add">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,18 @@
+﻿@page
+@model web.Pages.ware.wareModel
+@{
+    ViewData["Title"] = "仓库";
+}
+<script src="~/js/ware.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-btn-group">
+                <button type="button" class="layui-btn" id="open_ware_add">添加仓库</button>
+                <button type="button" class="layui-btn" id="open_stockin_pre">安置产品</button>
+            </div>
+        </div>
+        <div class="layui-card-body" id="ware-body">
+        </div>
+    </div>
+</body>

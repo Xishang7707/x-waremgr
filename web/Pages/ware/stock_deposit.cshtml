@@ -1,0 +1,48 @@
+﻿@page
+@model web.Pages.stock.stock_depositModel
+@{
+    ViewData["Title"] = "安置产品";
+}
+<script src="~/js/stock-deposit.js"></script>
+<body style="padding:3px;">
+    <div class="layui-card">
+        @*<div class="layui-card-header">
+            </div>*@
+        <div class="layui-card-body">
+            <form class="layui-form" action="" id="stock-deposit-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">仓库</label>
+                    <div class="layui-input-block">
+                        <input type="hidden" name="ware_id" id="ware_id">
+                        <select name="ware_name" lay-verify="" lay-filter='ware_name' lay-search id="ware_name"></select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">数量</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="quantity" autocomplete="off" class="layui-input" maxlength="30">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">位置</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="location" autocomplete="off" class="layui-input" maxlength="100">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="remark" autocomplete="off" class="layui-input" maxlength="100">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div>
+            <div style="text-align: center;">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" id="btn-deposit-stock">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
