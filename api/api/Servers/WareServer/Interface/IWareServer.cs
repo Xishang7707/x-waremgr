@@ -30,6 +30,13 @@ namespace api.Servers.WareServer.Interface
         /// @xis 获取所有仓库
         /// </summary>
         /// <returns></returns>
-        Task<Result<IEnumerable<WareResult>>> GetAllWares();
+        Task<Result> GetAllWares();
+
+        /// <summary>
+        /// @xis 放置货物
+        /// </summary>
+        /// <param name="reqmodel"></param>
+        /// <returns></returns>
+        Task<Result> DepositStockAsync(reqmodel<StockDepositModel> reqmodel);
     }
 }

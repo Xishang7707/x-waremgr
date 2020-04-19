@@ -62,5 +62,22 @@ namespace api.Controllers
             IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
             return await wareServer.GetAllWares();
         }
+
+        /// <summary>
+        /// @xis 安置产品
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("depositstock")]
+        public async Task<IActionResult> DepositStock([FromBody]StockDepositModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return GetModelErrorCode();
+            }
+            reqmodel<StockDepositModel> reqmodel = await RequestPackingAsync(model);
+            IWareServer wareServer = new WareServerImpl(g_dbHelper, g_logServer);
+            return await wareServer.DepositStockAsync(reqmodel);
+        }
     }
 }

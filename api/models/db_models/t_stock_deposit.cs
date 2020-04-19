@@ -31,6 +31,13 @@ namespace models.db_models
         /// </summary>
         public string location { get; set; }
 
+        public dynamic rv { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string remark { get; set; }
+
         /// <summary>
         /// 添加时间
         /// </summary>

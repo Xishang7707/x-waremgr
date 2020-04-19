@@ -304,6 +304,48 @@ namespace common.Consts
         /// 备注最长100个字符
         /// </summary>
         public const string ERROR_1049 = "1049";
+
+        /// <summary>
+        /// 仓库不存在
+        /// </summary>
+        public const string ERROR_1050 = "1050";
+
+        /// <summary>
+        /// 请选择仓库
+        /// </summary>
+        public const string ERROR_1051 = "1051";
+
+        /// <summary>
+        /// 该产品已经被全部安置完毕，请刷新列表重试
+        /// </summary>
+        public const string ERROR_1052 = "1052";
+
+        /// <summary>
+        /// 被安置的产品不存在或已被安置完毕
+        /// </summary>
+        public const string ERROR_1053 = "1053";
+
+        /// <summary>
+        /// 安置的产品数量必须大于0
+        /// </summary>
+        public const string ERROR_1054 = "1054";
+
+        /// <summary>
+        /// 请填写产品安置的位置
+        /// </summary>
+        public const string ERROR_1055 = "1055";
+
+        /// <summary>
+        /// 安置的数量超过剩余未安置的数量
+        /// </summary>
+        public const string ERROR_1056 = "1056";
+
+        /// <summary>
+        /// 位置字符长度不能大于100
+        /// </summary>
+        public const string ERROR_1057 = "1057";
+
+
         #endregion
     }
 }

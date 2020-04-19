@@ -6,6 +6,8 @@ using common.Consts;
 using common.DB.Interface;
 using models.db_models;
 using models.enums;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -67,7 +69,104 @@ namespace api.Servers.WareServer.Impl
             return result;
         }
 
-        public async Task<Result<IEnumerable<WareResult>>> GetAllWares()
+        public async Task<Result> DepositStockAsync(reqmodel<StockDepositModel> reqmodel)
+        {
+            string modelname = @"WareServerImpl.DepositStockAsync";
+            Result result = new Result { status = ErrorCodeConst.ERROR_403 };
+            //待入库库存
+            if (reqmodel.Data.id == 0)
+            {
+                result.code = ErrorCodeConst.ERROR_1053;
+                return result;
+            }
+            string stock_pre_sql = g_sqlMaker.Select<t_stockin_pre>(s => new { s.id, s.quantity, s.stock_id, s.rv }).Where("id", "=", "@id").ToSQL();
+            t_stockin_pre stock_pre = await g_dbHelper.QueryAsync<t_stockin_pre>(stock_pre_sql, new { id = reqmodel.Data.id });
+            if (stock_pre == null || stock_pre.quantity <= 0)
+            {
+                result.code = ErrorCodeConst.ERROR_1053;
+                return result;
+            }
+            if (reqmodel.Data.quantity <= 0)
+            {
+                result.code = ErrorCodeConst.ERROR_1054;
+                return result;
+            }
+            if (reqmodel.Data.quantity > stock_pre.quantity)
+            {
+                result.code = ErrorCodeConst.ERROR_1056;
+                return result;
+            }
+            //仓库
+            if (reqmodel.Data.ware_id == 0)
+            {
+                result.code = ErrorCodeConst.ERROR_1050;
+                return result;
+            }
+            string ware_exist_sql = g_sqlMaker.Select<t_ware>().Count().Where("id", "=", "@id").And("status", "=", "@status").And("state", "=", "@state").ToSQL();
+            bool ware_exist_flag = await g_dbHelper.QueryAsync<int>(ware_exist_sql, new { id = reqmodel.Data.ware_id, status = (int)EnumStatus.Enable, state = (int)EnumState.Normal }) == 1;
+            if (!ware_exist_flag)
+            {
+                result.code = ErrorCodeConst.ERROR_1050;
+                return result;
+            }
+
+            t_stock_deposit stock_deposit = new t_stock_deposit
+            {
+                location = reqmodel.Data.location,
+                quantity = reqmodel.Data.quantity,
+                remark = reqmodel.Data.remark,
+                stock_id = stock_pre.stock_id,
+                ware_id = reqmodel.Data.ware_id
+            };
+
+            //设置存放位置和预入库数量
+            g_dbHelper.Transaction();
+            try
+            {
+                string deposit_sql = g_sqlMaker.Insert<t_stock_deposit>(i => new { i.ware_id, i.stock_id, i.quantity, i.remark, i.location }).ToSQL();
+                bool insert_deposit_flag = await g_dbHelper.ExecAsync(deposit_sql, stock_deposit) > 0;
+                if (!insert_deposit_flag)
+                {
+                    g_dbHelper.Rollback();
+                    result.code = ErrorCodeConst.ERROR_1030;
+                    return result;
+                }
+
+                stock_pre.quantity -= reqmodel.Data.quantity;
+                bool stockin_pre_flag = false;
+                if (stock_pre.quantity == 0)
+                {
+                    string stock_pre_oper_sql = g_sqlMaker.Delete<t_stockin_pre>().Where("id", "=", "@id").And("rv", "=", "@rv").ToSQL();
+                    stockin_pre_flag = await g_dbHelper.ExecAsync(stock_pre_oper_sql, stock_pre) > 0;
+                }
+                else
+                {
+                    string stock_pre_oper_sql = g_sqlMaker.Update<t_stockin_pre>(u => new { u.quantity }).Where("id", "=", "@id").And("rv", "=", "@rv").ToSQL();
+                    stockin_pre_flag = await g_dbHelper.ExecAsync(stock_pre_oper_sql, stock_pre) > 0;
+                }
+                if (!stockin_pre_flag)
+                {
+                    g_dbHelper.Rollback();
+                    result.code = ErrorCodeConst.ERROR_1030;
+                    return result;
+                }
+
+                g_dbHelper.Commit();
+                g_logServer.Log(modelname, "安置产品成功", $"用户：{reqmodel.User.user_name}", EnumLogType.Info);
+            }
+            catch (Exception e)
+            {
+                g_dbHelper.Rollback();
+                g_logServer.Log(modelname, "安置产品异常", $"用户：{reqmodel.User.user_name},信息：{JsonConvert.SerializeObject(e)}", EnumLogType.Error);
+            }
+
+            result.code = ErrorCodeConst.ERROR_1029;
+            result.status = ErrorCodeConst.ERROR_200;
+
+            return result;
+        }
+
+        public async Task<Result> GetAllWares()
         {
             string sql_select = g_sqlMaker.Select<t_ware>().Where("status", "=", "@status").And("state", "=", "@state").ToSQL();
             List<t_ware> data_list = await g_dbHelper.QueryListAsync<t_ware>(sql_select, new { status = (int)EnumStatus.Enable, state = (int)EnumState.Normal });

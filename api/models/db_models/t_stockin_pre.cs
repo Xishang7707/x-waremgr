@@ -21,6 +21,13 @@ namespace models.db_models
         /// </summary>
         public decimal quantity { get; set; }
 
+        public dynamic rv { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? update_time { get; set; }
+
         /// <summary>
         /// 添加时间
         /// </summary>
