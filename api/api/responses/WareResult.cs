@@ -11,6 +11,8 @@ namespace api.responses
     /// </summary>
     public class WareResult
     {
+        public int id { get; set; }
+
         /// <summary>
         /// 仓库名
         /// </summary>
@@ -26,12 +28,25 @@ namespace api.responses
         /// </summary>
         public string remark { get; set; }
 
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int status { get; set; }
+
+        /// <summary>
+        /// 添加时间
+        /// </summary>
+        public DateTime add_time { get; set; }
+
         public WareResult() { }
         public WareResult(t_ware model)
         {
+            this.id = model.id;
             this.name = model.name;
             this.location = model.location;
             this.remark = model.remark;
+            this.status = model.status;
+            this.add_time = model.add_time;
         }
     }
 }

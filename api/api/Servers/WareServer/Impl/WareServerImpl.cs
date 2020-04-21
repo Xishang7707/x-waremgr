@@ -169,11 +169,19 @@ namespace api.Servers.WareServer.Impl
 
         public async Task<Result> GetAllWares()
         {
-            List<t_ware> data_list = await GetAllWares(s => new t_ware());
+            List<t_ware> data_list = await GetAllWares(s => new { s.id, s.location, s.name, s.remark, s.status, s.add_time });
             List<WareResult> result_list = new List<WareResult>();
             foreach (var item in data_list)
             {
-                result_list.Add(new WareResult(item));
+                result_list.Add(new WareResult
+                {
+                    id = item.id,
+                    add_time = item.add_time,
+                    location = item.location,
+                    name = item.name,
+                    remark = item.remark,
+                    status = item.status,
+                });
             }
 
             Result<IEnumerable<WareResult>> result = new Result<IEnumerable<WareResult>>
