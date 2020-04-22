@@ -18,6 +18,7 @@ using common.DB.Interface;
 using common.SqlMaker.Interface;
 using models.db_models;
 using models.enums;
+using Org.BouncyCastle.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -954,6 +955,48 @@ namespace api.Servers.StockServer.Impl
             };
             result.data = paginer;
             return result;
+        }
+
+        public async Task<Result> GetStockPaginerAsync(reqmodel<StockPaginerModel> reqmodel)
+        {
+            Result<PaginerData<StockPaginerResult>> result = new Result<PaginerData<StockPaginerResult>> { status = ErrorCodeConst.ERROR_200, code = ErrorCodeConst.ERROR_200 };
+            result.data = await GetStockPaginer(reqmodel.Data.name, reqmodel.Data.page_index, reqmodel.Data.page_size);
+            return result;
+        }
+
+        public async Task<PaginerData<StockPaginerResult>> GetStockPaginer(string name, int page_index, int page_size)
+        {
+            IWhere<t_stock> where_data = g_sqlMaker.Select<t_stock>(s => new { s.product_name }).Distinct().Where();
+            IWhere<t_stock> where_total = g_sqlMaker.Select<t_stock>(null).Count("DISTINCT product_name").Where();
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                where_data = where_data.And("product_name", "like", "@product_name");
+                where_total = where_total.And("product_name", "like", "@product_name");
+            }
+
+            string sql_data = where_data.Pager(page_index, page_size).ToSQL();
+            string sql_total = where_total.ToSQL();
+            List<StockPaginerResult> list = new List<StockPaginerResult>();
+            List<string> name_list = await g_dbHelper.QueryListAsync<string>(sql_data, new { product_name = $"%{name?.Trim()}%" });
+            string sql = "select product_name, sum(quantity) as quantity from t_stock where product_name in @product_name group by product_name";
+            List<t_stock> data_list = await g_dbHelper.QueryListAsync<t_stock>(sql, new { product_name = name_list });
+            foreach (var item in data_list)
+            {
+                list.Add(new StockPaginerResult
+                {
+                    name = item.product_name,
+                    quantility = item.quantity
+                });
+            }
+            PaginerData<StockPaginerResult> paginer = new PaginerData<StockPaginerResult>
+            {
+                page_index = page_index,
+                page_size = page_size,
+                total = await g_dbHelper.QueryAsync<int>(sql_total, new { product_name = $"%{name?.Trim()}%" }),
+                Data = list
+            };
+
+            return paginer;
         }
     }
 }

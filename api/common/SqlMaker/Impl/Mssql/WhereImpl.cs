@@ -126,9 +126,9 @@ namespace common.SqlMaker.Impl.Mssql
             return (new OrderImpl<T>(_link_list) as IOrder).OrderByDesc(field);
         }
 
-        IPager IWhere<T>.Pager(int passcount, int count)
+        IPager IWhere<T>.Pager(int page_index, int page_size)
         {
-            return new PagerImpl<T>(_link_list, passcount, count);
+            return new PagerImpl<T>(_link_list, page_index, page_size);
         }
     }
 }

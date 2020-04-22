@@ -33,10 +33,10 @@ namespace common.SqlMaker.Interface
         /// <summary>
         /// 分页
         /// </summary>
-        /// <param name="passcount">跳过数量</param>
-        /// <param name="count">取数量</param>
+        /// <param name="page_index">页码</param>
+        /// <param name="page_size">数量</param>
         /// <returns></returns>
-        IPager Pager(int passcount, int count);
+        IPager Pager(int page_index, int page_size);
 
         /// <summary>
         /// and

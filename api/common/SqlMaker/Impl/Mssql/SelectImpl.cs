@@ -24,6 +24,11 @@ namespace common.SqlMaker.Impl.Mssql
         /// </summary>
         protected string _count_sql;
 
+        /// <summary>
+        /// discint
+        /// </summary>
+        protected string _discint_sql;
+
         public SelectImpl()
         {
             _link_list.Add(this);
@@ -46,6 +51,7 @@ namespace common.SqlMaker.Impl.Mssql
             this._select_cols = obj._select_cols;
             this._top_sql = obj._top_sql;
             this._count_sql = obj._count_sql;
+            this._discint_sql = obj._discint_sql;
 
             if (this._link_list.FirstOrDefault(f => f is ISelect<T>) is ISelect<T> _sel)
             {
@@ -88,6 +94,7 @@ namespace common.SqlMaker.Impl.Mssql
 
             sql += string.IsNullOrWhiteSpace(_top_sql) ? "" : $" {_top_sql}";
             sql += string.IsNullOrWhiteSpace(_count_sql) ? "" : $" {_count_sql}";
+            sql += string.IsNullOrWhiteSpace(_discint_sql) ? "" : $" {_discint_sql}";
 
             if (select_cols != null)
             {
@@ -118,14 +125,19 @@ namespace common.SqlMaker.Impl.Mssql
             return (new OrderImpl<T>(_link_list) as IOrder).OrderByDesc(field);
         }
 
-        IPager ISelect<T>.Pager(int passcount, int count)
+        IPager ISelect<T>.Pager(int page_index, int page_size)
         {
-            return new PagerImpl<T>(_link_list, passcount, count);
+            return new PagerImpl<T>(_link_list, page_index, page_size);
         }
 
         public IWhere<T> Where()
         {
             return new WhereImpl<T>(_link_list);
+        }
+
+        public ISelect<T> Distinct()
+        {
+            return MakeLink(f => f._discint_sql = $"DISTINCT");
         }
     }
 }

@@ -108,5 +108,20 @@ namespace api.Controllers
             IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
             return await stockServer.SearchStockPaginerAsync(reqmodel);
         }
+
+        /// <summary>
+        /// @xis 库存列表
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet("searchstockpaginer")]
+        public async Task<IActionResult> SearchStockPaginer([FromQuery]StockPaginerModel model)
+        {
+            reqmodel<StockPaginerModel> reqmodel = await RequestPackingAsync(model);
+            IStockServer stockServer = new StockServerImpl(g_dbHelper, g_logServer);
+            return await stockServer.GetStockPaginerAsync(reqmodel);
+        }
+
+
     }
 }

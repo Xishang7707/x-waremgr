@@ -23,6 +23,12 @@ namespace common.SqlMaker.Interface
         ISelect<T> Count(string col = "1");
 
         /// <summary>
+        /// 去重
+        /// </summary>
+        /// <returns></returns>
+        ISelect<T> Distinct();
+
+        /// <summary>
         /// 条件
         /// </summary>
         /// <param name="key"></param>
@@ -30,7 +36,7 @@ namespace common.SqlMaker.Interface
         /// <param name="val"></param>
         /// <returns></returns>
         IWhere<T> Where(string key, string rel, object val);
-        
+
         /// <summary>
         /// 条件
         /// </summary>
@@ -61,9 +67,9 @@ namespace common.SqlMaker.Interface
         /// <summary>
         /// 分页
         /// </summary>
-        /// <param name="passcount">跳过数量</param>
-        /// <param name="count">取数量</param>
+        /// <param name="page_index">页码</param>
+        /// <param name="page_size">数量</param>
         /// <returns></returns>
-        IPager Pager(int passcount, int count);
+        IPager Pager(int page_index, int page_size);
     }
 }
