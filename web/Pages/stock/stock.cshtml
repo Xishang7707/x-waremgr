@@ -1,36 +1,37 @@
 ﻿@page
-@model web.Pages.ware.wareModel
+@model web.Pages.stock.stockModel
 @{
-    ViewData["Title"] = "仓库";
+    ViewData["Title"] = "stock";
 }
-<script src="~/js/ware.js"></script>
+
+<script src="~/js/stock.js"></script>
 <body style="padding:3px;">
     <div class="layui-card">
         <div class="layui-card-header">
             <div class="layui-btn-group">
-                <button type="button" class="layui-btn" id="open_ware_add">添加仓库</button>
-                <button type="button" class="layui-btn" id="open_stockin_pre">安置产品</button>
+                @*<button type="button" class="layui-btn" id="open_ware_add">添加仓库</button>
+                    <button type="button" class="layui-btn" id="open_stockin_pre">安置产品</button>*@
             </div>
         </div>
-        <div class="layui-card-body" id="ware-body">
+        <div class="layui-card-body" id="stock-body">
             <table class="layui-table">
                 <colgroup>
-                    <col width="250"/>
-                    <col width="350"/>
-                    <col width="350"/>
-                    <col width="150"/>
-                    <col width="150"/>
+                    <col width="250" />
+                    <col width="350" />
+                    <col width="350" />
+                    <col width="150" />
+                    <col width="150" />
                 </colgroup>
                 <thead>
                     <tr>
-                        <th style='text-align:center'>仓库信息</th>
+                        <th style='text-align:center'>产品信息</th>
                         <th style='text-align:center'>地址</th>
                         <th style='text-align:center'>备注</th>
                         <th style='text-align:center'>状态</th>
                         <th style='text-align:center'>操作</th>
                     </tr>
                 </thead>
-                <tbody id="ware-list">
+                <tbody id="stock-list">
                 </tbody>
             </table>
         </div>

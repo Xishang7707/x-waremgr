@@ -15,8 +15,9 @@ function ware_add() {
         url: api_host + 'ware/addware',
         data: data,
         success: o => {
+            w.layer.msg(o['msg']);
             if (o['status'] != 200) {
-                return w.layer.msg(o['msg']);
+                return;
             }
             var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
             parent.layer.close(index);
